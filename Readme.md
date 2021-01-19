@@ -12,7 +12,7 @@ It should also work on MacOS with one of the linux-like platforms installed on t
 The following executables should be installed on your local machine.
 
 * [SWI-Prolog](https://www.swi-prolog.org/) (swipl in $PATH)
-* [R](https://www.r-project.org/) (compiled with --enable-R-shlib, the resulting *libR.so* should be in $LD_LIBRARY_PATH)
+* [R](https://www.r-project.org/) (compiled with --enable-R-shlib, the resulting _libR.so_ should be in $LD_LIBRARY_PATH)
 * [GOBNILP](http://www.cs.york.ac.uk/aig/sw/gobnilp/) (C language version with SCIP-solver; _gobnilp_ should be in $PATH)
 * [SCIP](https://scipopt.org/) SCIP ILP solver (needed by Gobnilp at installation time)
 * [graphviz](https://graphviz.org/) (for displaying, _dot_ executable should be in $PATH)
@@ -100,7 +100,8 @@ A more complex example:
 true.
 ```
 
-The above would create an output directory such as:  aml_min60-21.01.19/.
+The above would create an output directory: aml_min60-21.01.19 where the date stamp will reflect
+the current date.
 
 Cancer datasets from our paper (each can be run as per example above): 
 * aml (Acute myeloid leukaemia)
