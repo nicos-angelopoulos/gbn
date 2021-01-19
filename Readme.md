@@ -5,7 +5,7 @@ visualisation functions for analysing large scale patient studies from genomic i
 Specially so for cancer patient data.
 
 Currently only tested on *nix like systems. Developed on Linux Mint 2020.\
-It should also work on MacOS with one of the linux-like platforms installed on them.
+It should also work on MacOS with one of the linux-like platforms installed.
 
 ## Executable dependencies
 
