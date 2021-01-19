@@ -59,6 +59,7 @@ You can install each pack above independently/separately from within SWI-Prolog,
 ?- pack_install(mtx).
 ```
 
+All packs installable this way can be found on the SWI-Prolog [pack list](https://www.swi-prolog.org/pack/list).
 
 ## Installation, Loading & Testing
 
@@ -118,6 +119,7 @@ Datasets are in the source directory: data/ (with cancer datasets in data/gbns_i
 * license MIT
 * [gBN page](http://stoics.org.uk/~nicos/sware/gbn/)
 * [gBN git](https://github.com/nicos-angelopoulos/gbn)
+* [gBN at SWI-Prolog](https://www.swi-prolog.org/pack/list?p=gbn)
 
 ## Publications
 
