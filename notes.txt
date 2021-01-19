@@ -1,0 +1,10 @@
+edit all .pl files for non prolog/gbn.pl dependencies.
+
+remainder of runs for gbns_in_cancer
+
+create build scripts for raspberry & linux
+
+document dependencies:
+   Gobnilp, SCIP
+   graphivz (dot), R, Real
+   *by_unix*, debug_call, _disp_bn_, mtx, options, os_lib, stoics_lib, _svg_

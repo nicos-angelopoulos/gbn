@@ -1,0 +1,10 @@
+---   Releases   ---
+--------------------
+
+0.1 ...            on_the_hob (still)
+
+    @ 20.07.14   DATA:    MPN (still checking)
+                 RUN:     directory run
+    @ 19.01.31   ADDED:   default clause for gbn_fam_hmaps_order_net/2
+                 UPDATE:  few convert(true) in some mtx/2,3 calls
+    @ 16.??.??   DOC:     added doc/ and examples/
