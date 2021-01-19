@@ -97,5 +97,5 @@ true.
 
 ## Author
 
-Nicos Angelopoulos,
+Nicos Angelopoulos,\
 London, 2020
