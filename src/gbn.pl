@@ -4,22 +4,20 @@ Get the current version and publication date.
 
 ==
 ?- gbn_version( Vers, Date ).
-V = 0:0:5,
-D = date(2020, 9, 26).
+V = 0:1:0,
+D = date(2021, 1, 19).
 
 ==
 
 @author nicos angelopoulos
 @version  0.0.1 2014/4/8
-@version  0.0.2 2015/11/15
-@version  0.0.3 2017/3/12
-@version  0.0.4 2017/6/17,  gbn_mtx_paired/4, gbn_mtx_subs/3.
-@version  0.0.5 2020/9/26,  added all cancer datasets and cancer alias,+ version
+@version  0.1.0 2021/1/19
+@see http://stoics.org.uk/~nicos/sware/gbn
 @see http://www.cs.york.ac.uk/aig/sw/gobnilp/
 @tbd control replacement of dot (and other specials?) in Bn var names via options
 
 */
-gbn_version(0:0:5, date(2020,9,26)).
+gbn_version(0:1:0, date(2021,1,19)).
 
 gbn_defaults( Defs ) :-
 	% en_list( ArgS, Args ),
