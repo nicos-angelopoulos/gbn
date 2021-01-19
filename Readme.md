@@ -9,13 +9,13 @@ It should also work on MacOS with one of the linux-like platforms installed on t
 
 ## Executable dependencies
 
-The following executables should be in the local path (see end of file for links).
+The following executables should be installed on your local machine.
 
-* SWI-Prolog (swipl)
-* R (compiled with --enable-R-shlib, the resulting libR.so should be in your LD_LIBRARY_PATH)
-* gobnilp (C language version with SCIP-solver)
-* scip ILP solver (needed by Gobnilp)
-* graphviz (dot executable- for displaying)
+* [SWI-Prolog](https://www.swi-prolog.org/) (swipl in $PATH)
+* [R](https://www.r-project.org/) (compiled with --enable-R-shlib, the resulting *libR.so* should be in $LD_LIBRARY_PATH)
+* [GOBNILP](http://www.cs.york.ac.uk/aig/sw/gobnilp/) (C language version with SCIP-solver; _gobnilp_ should be in $PATH)
+* [SCIP](https://scipopt.org/) SCIP ILP solver (needed by Gobnilp at installation time)
+* [graphviz](https://graphviz.org/) (for displaying, _dot_ executable should be in $PATH)
 
 ## R dependencies 
 
@@ -108,19 +108,23 @@ Cancer datasets from our paper (each can be run as per example above):
 * mpn (Myeloproliferative neoplasms)
 * mye (Multiple myeloma)
 
-## pack info
+## Data
+Datasets are in the source directory: data/ (with cancer datasets in data/gbns_in_cancer/).
+
+## Pack info
 
 * author nicos angelopoulos
 * version  0.1 2021/1/19
 * license MIT
-
-## Links
 * [gBN page](http://stoics.org.uk/~nicos/sware/gbn/)
 * [gBN git](https://github.com/nicos-angelopoulos/gbn)
-* [SWI-Prolog](https://www.swi-prolog.org/)
-* [R](https://www.r-project.org/)
-* [SCIP](https://scipopt.org/)
-* [GOBNILP](http://www.cs.york.ac.uk/aig/sw/gobnilp/)
+
+## Publications
+
+* Classification and Personalized Prognosis in Myeloproliferative Neoplasms, [10.1056/NEJMoa1716614](http://dx.doi.org/10.1056/NEJMoa1716614)
+* Genomic Landscape and Chronological Reconstruction of Driver Events in Multiple Myeloma, [10.1038/s41467-019-11680-1](https://doi.org/10.1038/s41467-019-11680-1)
+* Molecular Evolution of IDH Wild-Type Glioblastomas Treated With Standard of Care Affects Survival and Design of Precision Medicine Trials: A Report From the EORTC 1542 Study, [10.1200/JCO.19.00367](https://ascopubs.org/doi/abs/10.1200/JCO.19.00367)
+
 
 ## Author
 
