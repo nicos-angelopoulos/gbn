@@ -5,25 +5,25 @@
 :- lib(gbn).
 :- lib(debug_call).
 
-:- debug(aml).
+:- debug(gbm).
 
-aml :-
-    debug_call( aml, start, true ),
-    DatF = 'data/aml/aml_min60.dat',
-    E = 7,
+gbm :-
+    debug_call( gbm, start, true ),
+    DatF = 'data/gbm/gbm.dat',
+    E = 1,
     GBNOpts = [ data(DatF),
                 setting(edge_penalty,E),
                 dir(OsOdir)
                 % debug(true)
               ],
     gbn( GBNOpts ),
-        debug_call( aml, start, fisher_nets ),
+        debug_call( gbm, start, fisher_nets ),
     gbn_fisher_nets( dir(OsOdir) ),    
-        debug_call( aml, start, fam_hmaps ),
+        debug_call( gbm, start, fam_hmaps ),
     gbn_fam_hmaps( dir(OsOdir) ),   % only for binaries
-        debug_call( aml, start, gates_nets ),
+        debug_call( gbm, start, gates_nets ),
     gbn_gates_nets( dir(OsOdir) ),
-        debug_call( aml, start, svg_legend ),
+        debug_call( gbm, start, svg_legend ),
     gbn_svg_legend( dir(OsOdir) ),
-        debug_call( aml, end, true ).
+        debug_call( gbm, end, true ).
     
