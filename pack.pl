@@ -1,6 +1,6 @@
 name( gbn ).
 title( 'BNs for large cohort genomic studies.' ).
-version( '0.1' ).
+version( '0.2' ).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
