@@ -4,6 +4,7 @@
 0.3
     21.07.06   FIXED:   go back to dir() and do not pass Opts to os_unique/3
                DOC:     finish 2 incomplete sentences
+               DOC:     new worked example with comments
 
 0.2        @    20.01.23
     20.01.23   RUN:     fixed [cancer(gbm)]
