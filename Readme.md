@@ -153,11 +153,90 @@ the items of which: (a) point to the dataset is to be analysed, (b) where the re
 Gobnilp settings for this run.
 
 ```
+?- GBNOpts = [ data(pack('gbn/data/gbns_in_cancer/aml/aml_min60.dat')),
+          dir(OsOdir),
+          setting(edge_penalty,7)
+        ],
+   gbn( GBNOpts ).
+
+GBNOpts = [data(pack('gbn/data/gbns_in_cancer/aml/aml_min60.dat')), dir('aml_min60-21.07.06'), setting(edge_penalty, 7)],
+OsOdir = 'aml_min60-21.07.06'.
+
+```
+In the above example the aml_min_60.dat from within the gbn installation is used.
+Output directory is given a variable, which means gbn creates a default name. In this case: OsOdir = 'aml_min60-21.07.06'.
+The option setting(edge_penalty,7) instructs Gobnilp to use value 7 for its edge_penalty setting. 
+
+Note, that often a directory will hold a number of Gobnilp runs on a single dataset where a number of settings might be tried.
+For the instance the following call will run 10 Gobnilp runs, each with a distinct integer value for edge_penalty in the
+range of 1-10.
+
+```
+?- GBNOpts = [ data(pack('gbn/data/gbns_in_cancer/aml/aml_min60.dat')),
+          dir(OsOdir),
+          multiple(edge_penalty,[1,2,3,4,5,6,7,8,9,10])
+        ],
+   gbn( GBNOpts ).
+
+GBNOpts = [data(pack('gbn/data/gbns_in_cancer/aml/aml_min60.dat')), dir('aml_min60-21.07.06.12.31'), multiple(edge_penalty, [1, 2, 3, 4, 5|...])],
+OsOdir = 'aml_min60-21.07.06.12.31'.
+```
+
+The new directory contents are:
+```
+?- ls('aml_min60-21.07.06.12.31').
+% aml_min60.dat                 aml_min60-e2.bn               aml_min60-e4.dot              aml_min60-e6.set              aml_min60-e8.svg
+% aml_min60-e10.bn              aml_min60-e2.dot              aml_min60-e4.set              aml_min60-e6.svg              aml_min60-e9.bn
+% aml_min60-e10.dot             aml_min60-e2.set              aml_min60-e4.svg              aml_min60-e7.bn               aml_min60-e9.dot
+% aml_min60-e10.set             aml_min60-e2.svg              aml_min60-e5.bn               aml_min60-e7.dot              aml_min60-e9.set
+% aml_min60-e10.svg             aml_min60-e3.bn               aml_min60-e5.dot              aml_min60-e7.set              aml_min60-e9.svg
+% aml_min60-e1.bn               aml_min60-e3.dot              aml_min60-e5.set              aml_min60-e7.svg              aml_min60_scnti.txt
+% aml_min60-e1.dot              aml_min60-e3.set              aml_min60-e5.svg              aml_min60-e8.bn               aml_min60.set
+% aml_min60-e1.set              aml_min60-e3.svg              aml_min60-e6.bn               aml_min60-e8.dot              aml_min60_std_output.txt
+% aml_min60-e1.svg              aml_min60-e4.bn               aml_min60-e6.dot              aml_min60-e8.set              
+true.
+
+?- 
 
 ```
 
+Given a directory of Gobnilp experiments on a single dataset, pack(gbn) has a number of predicates that can post process this directory to produce a number 
+of additional outputs.
 
+gbn_fisher_nets/1 can be used to produce visualisations of the produced BNs where edges are coloured according to Fisher statistic, where colour depends 
+on mutual-exclusivity or co-occurance and continuity of the line shows significance or not (doted line). In the single edge penalty example above 
+(edge_penalty=7) the following shos the contents of the output directory before and after the execution of gbn_fisher_nets/1.
 
+```
+?- ls('aml_min60-21.07.06').
+% aml_min60.bn                aml_min60.dot               aml_min60.set               aml_min60.svg               
+% aml_min60.dat               aml_min60_scnti.txt         aml_min60_std_output.txt    
+true.
+
+?- gbn_fisher_nets(dir('aml_min60-21.07.06')).
+true.
+
+?- ls('aml_min60-21.07.06').
+% aml_min60.bn                aml_min60.dot               aml_min60_fclr.dot          aml_min60_fisher.dot        aml_min60_scnti.txt         aml_min60_std_output.txt
+% aml_min60.dat               aml_min60_fclr.csv          aml_min60_fclr.svg          aml_min60_fisher.svg        aml_min60.set               aml_min60.svg
+true.
+
+?- 
+```
+
+gbn_fam_hmaps/1 produces a heatmap for each family in each output BN within the output directory is given to work on. In addition, the predicate generates single 
+pdf collecting all family heatmaps. These can be extremely useful for including into supplementary information of publications. Continue on the above example, we have:
+
+```
+?- gbn_fam_hmaps(dir('aml_min60-21.07.06')).
+true.
+
+?- ls('aml_min60-21.07.06').
+% aml_min60.bn                aml_min60_fams/             aml_min60_fclr.svg          aml_min60_gates_best.csv    aml_min60_scnti.txt         aml_min60.svg
+% aml_min60.dat               aml_min60_fclr.csv          aml_min60_fisher.dot        aml_min60_multi_prns.png    aml_min60.set               
+% aml_min60.dot               aml_min60_fclr.dot          aml_min60_fisher.svg        aml_min60_prns/             aml_min60_std_output.txt    
+true.
+```
 
 ## Raspberry pi 4 OS image
 

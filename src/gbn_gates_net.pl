@@ -21,7 +21,7 @@ gbn_gates_net_defaults( Defs ) :-
    with those found in the associated GatesF (see options below). All fitted gates are already in the per-family
    gate files, GatesF, here we simply chose the "best" gate from each family.
 
-   Currently, this is the gate with smallest p.value. Ignoring direction seems 
+   Currently, this is the gate with smallest p.value. Ignoring direction seems the best default.
 
    If no output file is given, it is constructed from DotF by postfixing (os_postfix/3) gates_best to the filename.
 
@@ -33,7 +33,7 @@ Opts
      edge theme (the original can be found at four_clrs)
 
   * format(Fmt=svg)
-     any value other than false, attempts to run upsh dot format=Fmt <lgBN.dot> on the 
+     any value other than false, attempts to run upsh dot format=Fmt <lgBN.dot> on the generated dot file
 
   * gates(GatesF)
      when GatesF is missing, it is guessed from DotF. 
