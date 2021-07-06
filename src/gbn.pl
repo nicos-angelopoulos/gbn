@@ -21,15 +21,11 @@ D = date(2021, 1, 23).
 gbn_version(0:2:0, date(2021,1,23)).
 
 gbn_defaults( Defs ) :-
-	% en_list( ArgS, Args ),
-	% ( memberchk(probname(Pfx),Args) -> true; Pfx = gob ),
-	% atomic_list_concat( [Pfx,DDotted], -, Gob ),
 	Defs = [ % dir(Gob),
-            copy(false),
+              copy(false),
 		    data(pack('gbn/data/asia.dat')),
 		    display_dot(svg),
-		    odir(_Odir),
-	        std_output(std_file)
+	         std_output(std_file)
 	       ].
 
 gbn :-
@@ -43,7 +39,7 @@ Options is a term or list of:
     if set to anything else than false the local file Copy is copied into Dir- multiple are allowed
 
   * dir(Dir)
-    working directory for runs, it should not exist (default: *<Pbname>-<date>*). When a variable, the name is returned
+    output directory for runs, it should not exist (default: *<Pbname>-<date>*). When a variable, the name is returned
 
   * display_dot(DispDot=svg)
     display dot filin format DispDot. false for not displaying.
@@ -182,9 +178,9 @@ gbn_out_dir( _ProbName, Dir, All ) :-
 gbn_out_dir( _ProbName, Dir, Opts ) :-
 	memberchk( dir_prefix(Pfx), Opts ),
 	!,
-	os_unique( Pfx, Dir, Opts ).
+	os_unique( Pfx, Dir, [] ).
 gbn_out_dir( ProbName, Dir, Opts ) :-
-	os_unique( ProbName, Dir, [create(false)|Opts] ),
+	os_unique( ProbName, Dir, [create(false)] ),
 	( memberchk(dir(Dir),Opts) -> true % returns it
 	                            ; true ).
 

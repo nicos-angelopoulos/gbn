@@ -111,7 +111,61 @@ Cancer datasets from our paper (each can be run as per example above):
 * mye (Multiple myeloma)
 
 ## Data
+
 Datasets are in the source directory: data/ (with cancer datasets in data/gbns_in_cancer/).
+
+## Documentation
+
+* [static lib documentation](http://stoics.org.uk/~nicos/sware/gbn/doc/html/gbn.html)
+
+## Main predicates - worked example
+
+The main flow of execution is to create a run of Gobnilp experiments which are deposited in a new directory.
+These create the vanilla Gobnilp outputs. gbn predicates are then called to operate on this directory to 
+create the additional analyses and outputs.
+
+For example in a new empty directory start an SWI session and load the library (here shown in Linux):
+```
+> mkdir /tmp/gbn_example
+> cd /tmp/gbn_example
+> swipl 
+
+Welcome to SWI-Prolog (threaded, 64 bits, version 8.3.26-20-g3cd115ec2)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit https://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+
+?- use_module(library(gbn)).
+% Loading installed R library: RColorBrewer
+% Loading installed R library: cowplot
+% Loading installed R library: ggplot2
+% Loading installed R library: ggpubr
+% Loading installed R library: gridExtra
+true.
+
+?- 
+```
+
+The first step in a gbn analysis is to run Gobnilp on some data with predicate gbn/1. This takes a list as argument, 
+the items of which: (a) point to the dataset is to be analysed, (b) where the results are to be placed and (c) change
+Gobnilp settings for this run.
+
+```
+
+```
+
+
+
+
+## Raspberry pi 4 OS image
+
+We also provide a full Raspberry pi 4 OS which has all dependencies installed within an Ubuntu 20.10 operating system.
+
+* [gBN Rasp4 image](http://stoics.org.uk/~nicos/sware/gbn/gbn_image.html)
+
+The compressed image is 3Gb in size and it will uncompress to 14Gb in size.
 
 ## Pack info
 
@@ -127,7 +181,6 @@ Datasets are in the source directory: data/ (with cancer datasets in data/gbns_i
 * Classification and Personalized Prognosis in Myeloproliferative Neoplasms, [10.1056/NEJMoa1716614](http://dx.doi.org/10.1056/NEJMoa1716614)
 * Genomic Landscape and Chronological Reconstruction of Driver Events in Multiple Myeloma, [10.1038/s41467-019-11680-1](https://doi.org/10.1038/s41467-019-11680-1)
 * Molecular Evolution of IDH Wild-Type Glioblastomas Treated With Standard of Care Affects Survival and Design of Precision Medicine Trials: A Report From the EORTC 1542 Study, [10.1200/JCO.19.00367](https://ascopubs.org/doi/abs/10.1200/JCO.19.00367)
-
 
 ## Author
 
