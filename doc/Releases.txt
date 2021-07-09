@@ -3,6 +3,7 @@
 
 0.3
     21.07.09   OPT:     y_tick_size_x11() and y_tick_size_cow()
+               OPT:     label_size(30)
     21.07.06   FIXED:   go back to dir() and do not pass Opts to os_unique/3
                DOC:     finish 2 incomplete sentences
                DOC:     new worked example with comments
@@ -12,7 +13,7 @@
 
 0.1        @    20.01.19
     20.07.14   DATA:    MPN (still checking)
-                 RUN:     directory run
+               RUN:     directory run
     19.01.31   ADDED:   default clause for gbn_fam_hmaps_order_net/2
-                 UPDATE:  few convert(true) in some mtx/2,3 calls
+               UPDATE:  few convert(true) in some mtx/2,3 calls
     16.??.??   DOC:     added doc/ and examples/

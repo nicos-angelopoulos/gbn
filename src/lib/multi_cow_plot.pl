@@ -8,6 +8,7 @@ multi_cow_plot_defaults( Defs ) :-
             % hjust(-0.01), % default is -0.5
             aspect(0.8),
             hjust(0.10),   % larger values move labels to the left 
+            label_size(30),
             labels(upper),
             ncol(2),
             stem(multi_cow_plot),
@@ -34,9 +35,12 @@ Opts
   * hjust(JustH= -1)
      horizontal justification (plot_grid() param.)
 
+  * label_size(Lsz=20)
+    label size (def for plot_grid() is 14).
+
   * labels(Lbls=upper)
      also can use lower, true (=upper), auto  and false. Else pass a list which is passed to the plotter
-     auto passes "auto" as labels which is recognised by the draing function (plot_grid())
+     auto passes "auto" as labels which is recognised by the drawing function (plot_grid())
 
   * ncol(Ncol=2)
      number of columns (plot_grid() param.)
@@ -61,14 +65,15 @@ multi_cow_plot( Plvs, Args ) :-
     options( labels(LblsTkn), Opts ),
     multi_cow_plot_labels( LblsTkn, Lenvs, Lbls ),
     options( [ncol(Ncol),hjust(JustH),vjust(JustV)], Opts ),
+    options( label_size(Lsz), Opts ),
     % Rargs = [scale=0.96,labels=Lbls,ncol=Ncol,hjust=JustH,vjust=JustV], % use scale= to fit labels in margins
-    Rargs = [labels=Lbls,ncol=Ncol,hjust=JustH,vjust=JustV,align="v"],
+    Rargs = [label_size=Lsz,labels=Lbls,ncol=Ncol,hjust=JustH,vjust=JustV,align="v"],
     append( Plvs, Rargs, PgArgs ),
     Grid =.. [plot_grid|PgArgs],
     % <- theme(plot.margin = unit(c(1,0.5,0.5,0.5), "cm")),  maybe theme_cow ? 
     mplot <- Grid,
     'mplot$layout$clip[mplot$layout$name == "panel"]' <- "off",
-    options( [stem(Stem),ext(Ext)], Opts ),
+    options( [stem(Stem),ext(ExtS)], Opts ),
     os_ext( Ext, Stem, File ),
     options( aspect(Aspect), Opts ),
     options( height(H), Opts ),
