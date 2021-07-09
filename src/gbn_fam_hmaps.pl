@@ -14,7 +14,7 @@ gbn_fam_hmaps_defaults( Defs ) :-
              cellheight(12),
              col_mut("#CB181D"),
              col_wt("#08519C"),
-             outputs([pdf,png]),
+             outputs(png),
              x11(X11B)
            ],
     ( getenv('SSH_TTY',_Shy) -> X11B = false; X11B = true ).
@@ -38,7 +38,7 @@ Opts:
   * dir(Dir='.')
       working directory
   * outputs(Outs=png)
-      output format(s)
+      output format(s) - propagates to multi_cow_plot/2 as ext()
   * x11(X11B)
      defaults to false if SSH_TTY is defined OS variable, and true otherwise; passed to mtx_mut_hmap/2
 

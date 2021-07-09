@@ -26,7 +26,7 @@ Opts
      value of the base_aspect_ratio parameter of cow plot
 
   * ext(Ext=png)
-     type of file to save on
+     type of file to save on (can be a list of extensions)
 
   * height(Height=H)
      height of the plot, if variable returns the height used
@@ -74,15 +74,19 @@ multi_cow_plot( Plvs, Args ) :-
     mplot <- Grid,
     'mplot$layout$clip[mplot$layout$name == "panel"]' <- "off",
     options( [stem(Stem),ext(ExtS)], Opts ),
-    os_ext( Ext, Stem, File ),
     options( aspect(Aspect), Opts ),
     options( height(H), Opts ),
+    en_list( ExtS, Exts ),
+    maplist( multi_cow_plot_ext(Stem,Lenvs,Aspect,H,mplot), Exts ),
+    r_remove( mplot ).
+
+multi_cow_plot_ext( Stem, Lenvs, Aspect, H, PlotR, Ext ) :-
+    os_ext( Ext, Stem, File ),
     ( var(H) -> H is max( ( ( (Lenvs + 1) // 2 ) * 1.5) * 0.0393701, 30)
               ; true ),
     % W is max( 20 + (Nc/4) + LXpad, 70 ),
     % <- save_plot( +File, mplot, ncol=2, base_height=H, base_width=W ),
-    <- save_plot( +File, mplot, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' ),
-    r_remove( mplot ).
+    <- save_plot( +File, PlotR, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' ).
 
 multi_cow_plot_labels( LblsTkn, Lnvs, Lbls ) :-
     multi_com_plot_labels_expand_known(LblsTkn,Lnvs,Lbls),
