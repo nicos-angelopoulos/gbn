@@ -35,7 +35,7 @@ Opts
      horizontal justification (plot_grid() param.)
 
   * labels(Lbls=upper)
-     also can use lower, true (=upper), auto  and false. Else pass a list wihcih is passed to the plotter
+     also can use lower, true (=upper), auto  and false. Else pass a list which is passed to the plotter
      auto passes "auto" as labels which is recognised by the draing function (plot_grid())
 
   * ncol(Ncol=2)
