@@ -29,6 +29,8 @@ mtx_mut_hmap_defaults( Defs ) :-
               rvar(mtx_mut_hmap),
               rvar_rmv(true),
               x11(true),
+              y_tick_size_x11(16),
+              y_tick_size_cow(40),
               options_types(Types)
               ].
 
@@ -66,6 +68,10 @@ Opts
     number for Width in mm for file plotting, defaults to: 20 + Nc + LXpad,
   * x11(X11=true)
     whether to plot on screen
+  * y_tick_size_cow(YtC=40)
+     size for y_ticks on the cow plots
+  * y_tick_size_x11(YtX=16)
+     size for y_ticks on X11 (and individual heatmaps)
 
 @author nicos angelopoulos
 @version  0.1 2017/02/14
@@ -164,6 +170,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
            % + scale_fill_manual(values=c("#CB181D","#08519C"))
            + scale_fill_manual( values=Clrs )   % values=c("#08519C","#CB181D","#000000") % CAREFULL order depends on lex order of $m
            + theme( legend.position= +ActLegPos
+                    , axis.text = element_text(size = TickSize)
                     , axis.title.x=element_blank()
                     , axis.text.x=element_blank()
                     , axis.ticks.x=element_blank()
@@ -177,7 +184,10 @@ mtx_mut_hmap( MtxIn, Args ) :-
                    % fill = guide_legend(order = 2, override.aes = list(shape = 21, size=3)) , shape = guide_legend( order= 1)
                   )
         ,
-    options_call( x11(true), real:(<-(print(Gp))), Opts ),
+    options( [y_tick_size_x11(YtX),y_tick_size_cow(YtC)], Opts ),
+    findall( Gp, member(TickSize,[YtX,YtC]), [GpX,GpC] ),
+
+    options_call( x11(true), real:(<-(print(GpX))), Opts ),
 
     % Height is max( (10 * (Nr + 1)) + LYpad, 1200 ),
     Height is (10 * (Nr + 1)) + LYpad,
@@ -185,7 +195,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
     append( Opts, [height(Height),width(Width),dpi(300)], SaveOpts ),
     mtx_mut_hmap_save( SaveOpts ),
     ( memberchk(plot(Plot),Opts) ->
-        Plot = Gp
+        Plot = GpC
         ;
         options_rvar_rmv( Rvar, Opts )
     ).

@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    21.07.09   OPT:     y_tick_size_x11() and y_tick_size_cow()
     21.07.06   FIXED:   go back to dir() and do not pass Opts to os_unique/3
                DOC:     finish 2 incomplete sentences
                DOC:     new worked example with comments
