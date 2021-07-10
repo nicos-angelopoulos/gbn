@@ -9,7 +9,7 @@
 
 gbm :-
     debug_call( gbm, start, true ),
-    DatF = pack('gbn/data/gbns_in_cancer/gbm/gbm.dat'),
+    DatF = pack('gbn/data/gbns_in_cancer/gbm/gbm_min05.dat'),
     E = 1,
     GBNOpts = [ data(DatF),
                 setting(edge_penalty,E),
