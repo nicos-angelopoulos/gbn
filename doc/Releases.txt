@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    21.07.10   FIXED:   reference to mye dataset
     21.07.09   OPT:     y_tick_size_x11() and y_tick_size_cow()
                OPT:     label_size(30)
                OPT:     allow list in ext()

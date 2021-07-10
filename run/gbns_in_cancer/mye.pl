@@ -17,7 +17,7 @@ Data copied from myeloma/rea.18/wgs/data/rea_min20.dat.
 
 mye :-
         debug_call( mye, start, true ),
-    DatF = 'data/mye/mye_min20.dat',
+    DatF = pack('gbn/data/gbns_in_cancer/mye/mye_min20.dat'),
     E = 2,
     GBNOpts = [ data(DatF),
                 setting(edge_penalty,E),
