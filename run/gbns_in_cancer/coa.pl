@@ -34,7 +34,7 @@ coa :-
     gbn_svg_legend( dir(OsOdir) ),
         debug_call( coa, end, true ).
     
-/** coa_all.
+/** coa_full.
 
 Run GBN on the colorectal cancer dataset for \epsilon =1...10.
 
