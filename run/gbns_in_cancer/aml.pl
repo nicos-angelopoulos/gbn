@@ -8,7 +8,8 @@
 
 /** aml.
 
-Run the AML cancer dataset.
+Run GBN on the AML cancer dataset with \epsilon = 7 producing all outputs
+as shown on GBN in cancer paper.
 
 ==
 ?- [cancer(aml)].
@@ -33,6 +34,30 @@ aml :-
                 setting(edge_penalty,E),
                 dir(OsOdir)
                 % debug(true)
+              ],
+    gbn( GBNOpts ),
+        debuc( aml, start, fisher_nets ),
+    gbn_fisher_nets( dir(OsOdir) ),    
+        debuc( aml, start, fam_hmaps ),
+    gbn_fam_hmaps( dir(OsOdir) ),   % only for binaries
+        debuc( aml, start, gates_nets ),
+    gbn_gates_nets( dir(OsOdir) ),
+        debuc( aml, start, svg_legend ),
+    gbn_svg_legend( dir(OsOdir) ),
+        debuc( aml, end, true ).
+    
+/** aml_full.
+
+Run GBN on the aml cancer dataset for \epsilon =1...10.
+
+*/
+aml_full :-
+    debuc( aml, start, true ),
+    DatF = pack('gbn/data/gbns_in_cancer/aml/aml_min60.dat'),
+    numlist( 1, 10, Es ),
+    GBNOpts = [ data(DatF),
+                multiple(edge_penalty,Es),
+                dir(OsOdir)
               ],
     gbn( GBNOpts ),
         debuc( aml, start, fisher_nets ),
