@@ -39,7 +39,7 @@ coa :-
 Run GBN on the colorectal cancer dataset for \epsilon =1...10.
 
 */
-coa_all :-
+coa_full :-
     debug_call( coa, start, true ),
     DatF = pack('gbn/data/gbns_in_cancer/coa/coa_min05.dat'),
     numlist( 1, 10, Es ),
