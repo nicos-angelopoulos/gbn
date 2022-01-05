@@ -10,7 +10,7 @@
 
 /** mpn.
 
-Run GBN on the myeloproliferative neoplasms (MPN) cancer dataset with \epsilon = 1 producing all outputs
+Run GBN on the myeloproliferative neoplasms (MPN) cancer dataset with \epsilon = 3 producing all outputs
 as shown on GBN in cancer paper.
 
 */
