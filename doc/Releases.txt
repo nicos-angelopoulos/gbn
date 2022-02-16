@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    22.02.16   OPT:     gg_muts_by_pnms/3: new plot_{title,leg_title,save_width}
     21.07.10   FIXED:   reference to mye dataset
                DATA:    haromise datasets and way they loaded in run scripts
     21.07.09   OPT:     y_tick_size_x11() and y_tick_size_cow()

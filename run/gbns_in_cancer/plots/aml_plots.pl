@@ -98,24 +98,49 @@ aml_freqs( Cut, _ ) :-
     mlu_frequency_plot( Preqs, Mlu ),
 
     % aml_min00_muts_by_pnms.pdf :
+    % 22.02.16: split the plot into 2. % a selected genese:
     aml_add_mutations_column( Mtx, Stx ),
+    mtx_lists( Stx, StxLists ),
+    findall( SelL, (member(SelL,StxLists),SelL=[SelDv|_],(SelDv=='Mutations' -> true; member(SelDv-TmsDv,Preqs),TmsDv>59),write(SelDv-TmsDv),nl), SelLists ),
+    mtx_lists( SelTx, SelLists ),
+    % aml_add_mutations_column( Mtx, Stx ),
+
     aml_colour( airforceblue, AFBclr ),
-    VLine = geom_segment(aes(x= -0.01, y = 60, xend = 84, yend = 60), color= +AFBclr, linetype="dashed", size=0.4),
+
+    length( SelLists, SelXLim ),
+    VLine = geom_segment(aes(x= -0.01, y = 60, xend = SelXLim, yend = 60), color= +AFBclr, linetype="dashed", size=0.4),
     % Vtext = annotate("text", x= -3, y= 60, hjust=0, vjust=0, label= "60"),
     % tmp <- 'data.frame'(tmpx=c(1,1),tmpy=c(2,3)),
     YTicks = scale_y_continuous(breaks = c(60,100,200,300,400)),
     YTheme = theme(axis.text.y = element_text(color = c(+AFBclr, "black", "black", "black", "black"), size=c(11,9,9,9,9) ),
          axis.ticks.y = element_line(color = c(+AFBclr, "black", "black", "black", "black"),
                           size = c(1,1,1,1,1))),
-    os_postfix( muts_by_pnms, PdfP, ByPnmsPdfP ),
+    os_postfix( muts_by_pnms_sel, PdfP, ByPnmsPdfP ),
     os_ext( pdf, ByPnmsPdfP, ByPnmsPdfS ),
-    Pnms = [panel_theme(axes),gg_terms([VLine,YTicks,YTheme]),x_axis_colour(x_axis_aml)],
-    gbn:gg_muts_by_pnms( Stx, ByPnmsPdfS, Pnms ).
+    PnmMain='Number of mutations for selected driver events.',
+    Pnms = [panel_theme(axes),gg_terms([VLine,YTicks,YTheme]),x_axis_colour(x_axis_aml),plot_save_width(7),plot_title(PnmMain)],
+    gbn:gg_muts_by_pnms( SelTx, ByPnmsPdfS, Pnms ),
+
+    % second plot: the ones that weren't selected
+    findall( RmvL, (member(RmvL,StxLists),RmvL=[RmvDv|_],(RmvDv=='Mutations' -> true; member(RmvDv-TmsDv,Preqs),TmsDv<60),write(RmvDv+TmsDv),nl), RmvLists ),
+    mtx_lists( RmvTx, RmvLists ),
+    os_postfix( muts_by_pnms_rmv, PdfP, ByPnmsPdfPRmv ),
+    os_ext( pdf, ByPnmsPdfPRmv,  ByPnmsPdfSRmv ),
+    RmvMain='Number of mutations for removed driver events.',
+
+    length( RmvLists, RmvXLim ),
+    RmvYTicks = scale_y_continuous(breaks = c(10,20,30,40,50,60)),
+    RmvVLine = geom_segment(aes(x= -0.01, y = 60, xend = RmvXLim, yend = 60), color= +AFBclr, linetype="dashed", size=0.4),
+    RmvPnms = [panel_theme(axes),gg_terms([RmvVLine,RmvYTicks,YTheme]),x_axis_colour(x_axis_aml),plot_save_width(12),plot_title(RmvMain)],
+
+    gbn:gg_muts_by_pnms( RmvTx, ByPnmsPdfSRmv, RmvPnms ).
 
 x_axis_aml( KVs, Clrs, Leg ) :-
+    write( kvs(KVs) ), nl,
     % write( here(A,B,C) ), nl,
     kv_decompose( KVs, Ks, _Vs ),
-    partition( hgnc_symbol_start, Ks, Symbs, _Nons ),
+    partition( hgnc_symbol_start, Ks, Symbs, Nons ), % _Nons
+    write( partition( hgnc_symbol_start, Ks, Symbs, Nons ) ), nl,
     Left = "#3B444B", % Left = "Arsenic",
     % Right = "#B2BEB5",  % Ash Grey
     Right = "#87A96B", % Asparagus
