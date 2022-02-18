@@ -23,11 +23,13 @@ mtx_mut_hmap_defaults( Defs ) :-
             ],
     Defs  = [ hclust(clms), 
               legend(bottom),
+              legend_show(true),
+              legend_font_size(10),
               % outputs: no default
               % plot(true), returns the plot term
-              stem(mtx_mut_hmap),
               rvar(mtx_mut_hmap),
               rvar_rmv(true),
+              stem(mtx_mut_hmap),
               x11(true),
               y_tick_size_x11(16),
               y_tick_size_cow(40),
@@ -49,6 +51,10 @@ Opts
     number for Height in mm for file plotting, defaults to: 10 + (10 * Nr) + LYpad,
   * legend(LegPos=bottom)
     atom or string of legend position (set to false/FALSE for no legend)
+  * legend_show(ShowLeg=true)
+    whether to show the legend
+  * legend_font_size(LegFntSz=10)
+    font size for the legend text
   * outputs(OutS)
     an output or list of outputs, each being either atomic or compound. 
     The functor, or atom, of each output should be an file extension understood by R's ggsave().
@@ -58,12 +64,12 @@ Opts
     produces a png image with non-default height at 200 mm.
   * plot(Plot)
     returns the plot term. if present, RvRmv is ignored and data frame is kept (as it will be needed when plotting Plot)
-  * stem(Stem=mtx_mut_hmap)
-    set to stem for output files  
   * rvar(Rvar=mtx_mut_hmap)
     variable to use for intermediate result
   * rvar_rmv(RvRmv=true)
     removes R var at end of call, see options_rvar_rmv/2 in pack b_real
+  * stem(Stem=mtx_mut_hmap)
+    set to stem for output files  
   * width(Width)
     number for Width in mm for file plotting, defaults to: 20 + Nc + LXpad,
   * x11(X11=true)
@@ -82,6 +88,9 @@ mtx_mut_hmap( MtxIn, Args ) :-
     options_append( mtx_mut_hmap, Args, Opts, pack(sanger) ),
     options( rvar(Rvar), Opts ),
     options( hclust(Hcl), Opts ),
+    options( legend_show(LegShow), Opts ),
+    upcase_atom( LegShow, ShowLeg ),
+    options( legend_font_size(LegFntSz), Opts ),
     mtx( MtxIn, Mtx ),
     % mtx( MtxIn, MtxRev ),
     % reverse( MtxRev, Mtx ),
@@ -166,7 +175,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
         )
     ),
     Clrs =.. [c|ClrsL],   % because cows plot needs them un-magicked...
-    Gp = ggplot(Rvar) + geom_tile( aes(x=x,y=y,fill=m) ) 
+    Gp = ggplot(Rvar) + geom_tile( aes(x=x,y=y,fill=m), 'show.legend'=ShowLeg ) 
            % + scale_fill_manual(values=c("#CB181D","#08519C"))
            + scale_fill_manual( values=Clrs )   % values=c("#08519C","#CB181D","#000000") % CAREFULL order depends on lex order of $m
            + theme( legend.position= +ActLegPos
@@ -180,7 +189,9 @@ mtx_mut_hmap( MtxIn, Args ) :-
                     , panel.background = element_blank()
                     , panel.margin= unit(c(2,2,2,2), "cm")
                   )
-          + guides(fill = guide_legend(keywidth = 0.3, keyheight = 0.6)
+          + guides(fill = guide_legend(order = 2, keywidth = 0.8, keyheight = 1.6, 
+                                       label.theme = element_text(size = LegFntSz,face = "italic",angle = 0)  % colour="red", 
+                                      )
                    % fill = guide_legend(order = 2, override.aes = list(shape = 21, size=3)) , shape = guide_legend( order= 1)
                   )
         ,
