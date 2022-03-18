@@ -20,8 +20,9 @@
 %
 % Ces - Mutual exclusivity (significant)
 %
-gbn_fisher_theme_colours( org, "#4B5320", "#35978F", "#CC0000", "#BF812D" ).
-gbn_fisher_theme_colours( bic, "#35978F", "#35978F", "#BF812D", "#BF812D" ).
+% Cnu - Neutral colour (when cannot establish direction, ie non binary data)
+gbn_fisher_theme_colours( org, "#4B5320", "#35978F", "#CC0000", "#BF812D", "#5D8AA8" ).
+gbn_fisher_theme_colours( bic, "#35978F", "#35978F", "#BF812D", "#BF812D", "#5D8AA8" ).
 
 gbn_fisher_theme_dashed( org, solid ).
 gbn_fisher_theme_dashed( bic, dashed ).
@@ -50,6 +51,7 @@ gbn_fisher_net_defaults( Args, Defs ) :-
             clr_co_signif(Ccs),
             clr_ex(Cex),
             clr_ex_signif(Ces),
+            clr_neutral(Cnu),
             dashed(Dashed),
             edge_width(Ew),
             node_pen_width(Nw),
@@ -63,7 +65,7 @@ gbn_fisher_net_defaults( Args, Defs ) :-
     gbn_fisher_theme_edge_width( Theme, Ew ),
     gbn_fisher_theme_node_pen_width( Theme, Nw ),
     gbn_fisher_theme_background( Theme, Bg ),
-    gbn_fisher_theme_colours( Theme, Cco, Ccs, Cex, Ces ).
+    gbn_fisher_theme_colours( Theme, Cco, Ccs, Cex, Ces, Cnu ).
 
 /** gbn_fisher_net( +DatF, +BnF, -FisheredF ).
     gbn_fisher_net( +DatF, +BnF, -FisheredF, +Opts ).
@@ -91,6 +93,9 @@ Opts
 
   * clr_ex_signif(ClrExSgn)
     colour for mutual exclusivity (for significant values), default depends on Theme
+
+  * clr_neutral(ClrNeu)
+    colour for neutral directions (ie when non binary data are analysed)
 
   * clr_theme(Theme=bic)
     defines default colour values.
@@ -157,6 +162,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     options( clr_co_signif(Ccs), Opts ),
     options( clr_ex(Cex), Opts ),
     options( clr_ex_signif(Ces), Opts ),
+    options( clr_neutral(Cnu), Opts ),
     options( dashed(Dash), Opts ),
     options( edge_width(Ew), Opts ),
     options( node_pen_width(Nw), Opts ),
@@ -171,7 +177,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     memberchk( edge_metrics(MeTrips), Opts ),
 
     % maplist( gbn_fisher_family_dot_edge_attrs(Style,EwDw,Clr,UpClr,JsDw,JsUp,Dash), Trips, FamsAttrs ),
-    maplist( gbn_fisher_family_dot_edge_attrs(Ew,Ces,Ccs,Cex,Cco,Dash), MeTrips, FamsAttrs ), %fixme: double/triple check colours ! 18.02.19
+    maplist( gbn_fisher_family_dot_edge_attrs(Ew,Ces,Ccs,Cex,Cco,Cnu,Dash), MeTrips, FamsAttrs ), %fixme: double/triple check colours ! 18.02.19
     % EAGoal = gbn_fisher_family_dot_edges(PvalsRv,OddsRv,Ces,Ccs,Cex,Cco,Dash,Ew), 
     % maplist( EAGoal, Bn, EAttrsNest ),
     % flatten( EAttrsNest, EAttrs ),
@@ -253,14 +259,22 @@ gbn_fisher_family_metrics( BHsR, Odds, X-Ys, Trips ) :-
                                 ),
                                     Trips ).
 
-gbn_fisher_family_dot_edge_attrs( Ew, DwClr, UpClr, JsDw, JsUp, Dash, X-Y-po(Pval,Oval), FamAttrs ) :-
+gbn_fisher_family_dot_edge_attrs( Ew, DwClr, UpClr, JsDw, JsUp, Cnu, Dash, X-Y-po(Pval,Oval), FamAttrs ) :-
     gbn_fisher_edge_width( Ew, Oval, Pw ),
     ( Pval < 0.05 ->
         Style = solid,
-        ( Oval > 1 -> Clr = UpClr ; Clr = DwClr )
+        ( number(Oval) ->
+               ( Oval > 1 -> Clr = UpClr ; Clr = DwClr )
+               ; % non binary data
+               Clr = Cnu
+        )
         ;
         Style = Dash,
-        ( Oval > 1 -> Clr = JsUp ; Clr = JsDw  )
+        ( number(Oval) ->
+          ( Oval > 1 -> Clr = JsUp ; Clr = JsDw  )
+               ; % non binary data
+               Clr = Cnu
+        )
     ),
     FamAttrs = X-Y-[color(Clr),style(Style),penwidth(Pw)].
 
@@ -325,7 +339,7 @@ di_member( [_H1|T1], [_H2|T2], E1, E2 ) :-
 gbn_fisher_edge_width( prop, Oval, Pw ) :-
     ( number(Oval) -> atom_number(OvalAtm,Oval); OvalAtm = Oval ), % should go straight to if part below if not a number
     % fixme: is the ONan test too general ?
-    ( (atom_concat(_,'NaN',OvalAtm);Oval=='1.0Inf';Oval=:=0;Oval=:= 1.0Inf ) -> 
+    ( (atom_concat(_,'NaN',OvalAtm);Oval=='1.0Inf';Oval==true;Oval=:=0;Oval=:= 1.0Inf ) -> 
         Pw is 4
         ;
         ( Oval > 1 ->

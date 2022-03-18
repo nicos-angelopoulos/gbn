@@ -47,7 +47,7 @@ gbn_fisher_nets( Args ) :-
 	gbn_data_file( DatFs, DatF ),
 
 	include( os_ext(bn), Files, BnFs ),
-	map_list_options( gbn_fisher_net(DatF), BnFs, _Fishes, Opts ),  
+	map_list_options( gbn_fisher_net(DatF), BnFs, _Fishes, call_options(Opts) ),  
             % do not use the gbn_fisher_net/3 version !
 	working_directory( _, Here ).
 
