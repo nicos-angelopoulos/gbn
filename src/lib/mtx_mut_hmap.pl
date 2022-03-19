@@ -15,13 +15,15 @@ mtx_mut_hmap_test :-
     mtx_mut_hmap( Mtx, [] ).
 
 mtx_mut_hmap_defaults( Defs ) :- 
-    Types = [   hclust-oneof([clms,false]), rvar-atom,  rvar_rmv-boolean,
+    Types = [   as_mutational-boolean,
+                hclust-oneof([clms,false]), rvar-atom,  rvar_rmv-boolean,
                 % legend, atom or string % fixme: allow multitypes in type/n
                 % height-number, width-number, dpi-integer,   % does options_append complain here ?
                 % plot-var,
                 stem-atom, x11-boolean
             ],
-    Defs  = [ hclust(clms), 
+    Defs  = [ as_mutational(true),
+              hclust(clms), 
               legend(bottom),
               legend_show(true),
               legend_font_size(10),
@@ -33,16 +35,32 @@ mtx_mut_hmap_defaults( Defs ) :-
               x11(true),
               y_tick_size_x11(16),
               y_tick_size_cow(40),
-              options_types(Types)
+              options_types(Types),
+              col_mut("#CB181D"),
+              col_wt("#08519C"),
+              col_hmap([])
               ].
 
 /** mtx_mut_hmap( +Mtx, +Opts ).
 
 Display heatmap of a mutations matrix on screen or on file.
 
+As of version 0.2 we support arbitrary integer value matrices. 
+To do so, use AsMut == false and give a ClrH pairlist that will link each matrix value
+to the color for drawing it.
+
 This should have different backends, but currently only supports ggplot().
 
 Opts 
+  * as_mutational(AsMut=true)
+    whether the matrix contains mutational data (when false arbitary integer values are assumed)
+  * col_hmap(ClrH=[])
+    list of value-"Colour" for each value in mtx (can contain non mtx values).
+    If this is given it overrides ClrM and ClrW.
+  * col_mut(ClrM="#CB181D")),
+    colour from mutations (mtx values = 1)
+  * col_wt(ClrW="#08519C")),
+    colour from background (mtx values = 0)
   * dpi(Dpi=300)
     dpi for output files
   * hclust(Hclust=clms)
@@ -75,25 +93,25 @@ Opts
   * x11(X11=true)
     whether to plot on screen
   * y_tick_size_cow(YtC=40)
-     size for y_ticks on the cow plots
+     size for y_ticks on the cowplots
   * y_tick_size_x11(YtX=16)
      size for y_ticks on X11 (and individual heatmaps)
 
-@author nicos angelopoulos
-@version  0.1 2017/02/14
-@tbd    make default rvar a non-existant variable
+@author  nicos angelopoulos
+@version 0.1 2017/02/14
+@version 0.2 2022/03/19, support non-mutational hmaps
+@tbd     make default rvar a non-existant variable
 
 */
 mtx_mut_hmap( MtxIn, Args ) :-
     options_append( mtx_mut_hmap, Args, Opts, pack(sanger) ),
+    options( as_mutational(Bin), Opts ),
     options( rvar(Rvar), Opts ),
     options( hclust(Hcl), Opts ),
     options( legend_show(LegShow), Opts ),
     upcase_atom( LegShow, ShowLeg ),
     options( legend_font_size(LegFntSz), Opts ),
     mtx( MtxIn, Mtx ),
-    % mtx( MtxIn, MtxRev ),
-    % reverse( MtxRev, Mtx ),
     findall( Rwn-DtRow, ( member(Row,Mtx), 
                           Row =.. [Rfun,Rwn|Dt],
                           DtRow =.. [Rfun|Dt]
@@ -108,76 +126,39 @@ mtx_mut_hmap( MtxIn, Args ) :-
     Rwms <- rownames(Rvar),
     atomic_list_concat( [Rvar,df], '_', Df ),
     Df <- data.frame( x=integer(), y=character(), m=character(), stringsAsFactors='FALSE' ),
-    findall( _,         ( % between(1,Nr,Rn),
-                            nth1(Rn,Rwms,Rwm),
+    findall( _,         (   nth1(Rn,Rwms,Rwm),
                             between(1,Nc,Cn),
                             Ri is ((Rn - 1) * Nc ) + Cn,
                             Df[Ri,1] <- Cn,
-                            % atom_string( Rwm, Swm ),
                             Df[Ri,2] <- +Rwm,
                             Mut <- Rvar[Rn,Cn],
-                            % 17.10.04: select reds for mutations for that 1
-                            %           make sure though in colours that there is no blue if thee is no zero
-
-                            %  mutation = 1, background 0
-                            %  however, we allow for other values as there might be other discrete values in the dataset
-                            %  thus we interpret 0 as background and mutI for each value > 0
-                            ( Mut > 0 -> 
-                                        ( Mut =:= 1 -> 
-                                            Mfc = mutation
-                                            ;
-                                            atom_concat( mutation, Mut, Mfc )
-                                        )
-                                       ; 
-                                       Mfc = background 
-                            ),
-                            % ( Mut =:= 1 -> Mfc = mutation; Mfc = background ),  % if labels are changed make sure colours coordinate
-                            Df[Ri,3] <- + Mfc
+                            mtx_mut_hmap_clr_value( Bin, Mut, Mfc ),
+                            Df[Ri,3] <- Mfc
                          ),
                             _ ),
-    % Df$y <- as.factor(Df$y),»
-    % <- print( unique(Df$y) ),
-    % Df$y <- as.character(Df$y),
-    % Df$y <- factor(Df$y, levels=unique(Df$y)),
-    % Df$m <- as.factor(Df$m),
     Rvar <- Df,
     Rvar$y <- as.character(Rvar$y),
-    % Rvar$y <- factor(Rvar$y, levels=unique(Rwns)),
     Rvar$y <- factor(Rvar$y, levels=rev(Rwns)),
-    % Rvar$y <- factor(Rvar$y, levels=unique(Rvar$y)),
-    % <- Rvar$y,
     r_remove( Df ),
     options( legend(LegPos), Opts ),
     mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ),
-    GotMuns <- Rvar$m,
-    sort( GotMuns, GotMprv ),
-    ( is_list(GotMprv) -> GotMprv = GotM; GotM = [GotMprv] ),
-    length( GotM, GotMlen ),
-    RedAtms <- brewer.pal(9,"Reds"),
-    maplist( atom_string, RedAtms, Reds ),
-    ( memberchk(background,GotM) ->
-        ( GotMlen > 10 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(GotM) )
-                          ;
-                          ( GotMlen =:= 2 ->
-                                ClrsL = ["#08519C","#CB181D"]
-                                ;
-                                Lim is GotMlen - 1,
-                                length( RedClrs, Lim ),
-                                once( append(_,RedClrs,Reds) ),
-                                ClrsL = ["#08519C"|RedClrs]
-                          )
-        )
-        ;
-        ( GotMlen > 9 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(GotM) )
-                         ; 
-                         length( ClrsL, GotMlen ),
-                         once( append(_,ClrsL,Reds) )
-        )
+    PreLvls <- levels(as.factor(Rvar$m)),
+    ( catch(maplist(atom_number,PreLvls,LvlsN),_,fail) ->
+          % if all values are numeric, then sort them by numeric value and not lexigocraphically
+          sort( LvlsN, LvlsO ),
+          maplist( atom_number, NewLvls, LvlsO ),
+          Rvar$m <- factor( as.factor(Rvar$m), levels = NewLvls )
+          ;
+          % else leave them as they are
+          true
     ),
-    Clrs =.. [c|ClrsL],   % because cows plot needs them un-magicked...
+    LvlsPrv <- levels(as.factor(Rvar$m)),
+    (is_list(LvlsPrv) -> LvlsPrv = Lvls; Lvls = [LvlsPrv]), % fixme: throw error if not a list...
+    options( col_hmap(ClrH), Opts ),
+    mtx_mut_hmap_colours( ClrH, Lvls, ClrsL, Opts ),
+    Clrs =.. [c|ClrsL],   % because cowplot needs them un-magicked...
     Gp = ggplot(Rvar) + geom_tile( aes(x=x,y=y,fill=m), 'show.legend'=ShowLeg ) 
-           % + scale_fill_manual(values=c("#CB181D","#08519C"))
-           + scale_fill_manual( values=Clrs )   % values=c("#08519C","#CB181D","#000000") % CAREFULL order depends on lex order of $m
+           + scale_fill_manual( values=Clrs)
            + theme( legend.position= +ActLegPos
                     , axis.text = element_text(size = TickSize)
                     , axis.title.x=element_blank()
@@ -190,17 +171,12 @@ mtx_mut_hmap( MtxIn, Args ) :-
                     , panel.margin= unit(c(2,2,2,2), "cm")
                   )
           + guides(fill = guide_legend(order = 2, keywidth = 0.8, keyheight = 1.6, 
-                                       label.theme = element_text(size = LegFntSz,face = "italic",angle = 0)  % colour="red", 
+                                label.theme = element_text(size = LegFntSz,face = "italic",angle = 0)
                                       )
-                   % fill = guide_legend(order = 2, override.aes = list(shape = 21, size=3)) , shape = guide_legend( order= 1)
-                  )
-        ,
+                  ),
     options( [y_tick_size_x11(YtX),y_tick_size_cow(YtC)], Opts ),
     findall( Gp, member(TickSize,[YtX,YtC]), [GpX,GpC] ),
-
     options_call( x11(true), real:(<-(print(GpX))), Opts ),
-
-    % Height is max( (10 * (Nr + 1)) + LYpad, 1200 ),
     Height is (10 * (Nr + 1)) + LYpad,
     Width  is max( 20 + (Nc/4) + LXpad, 70 ),
     append( Opts, [height(Height),width(Width),dpi(300)], SaveOpts ),
@@ -209,6 +185,54 @@ mtx_mut_hmap( MtxIn, Args ) :-
         Plot = GpC
         ;
         options_rvar_rmv( Rvar, Opts )
+    ).
+
+mtx_mut_hmap_colours( [H|T], Lvls, Clrs, _Opts ) :-
+     !,
+     Pairs = [H|T],
+     findall(Clr, (member(Lvl,Lvls),(memberchk(Lvl-Clr,Pairs)->true;throw(missing_colour_spec(Lvl)))), Clrs ).
+mtx_mut_hmap_colours( _, Lvls, Clrs, Opts ) :-
+    length( Lvls, LvlsLen ),
+    RedAtms <- brewer.pal(9,"Reds"),
+    maplist( atom_string, RedAtms, Reds ),
+    options( [col_mut(ClrM),col_wt(ClrW)], Opts ),
+    ( memberchk(background,Lvls) ->
+        ( LvlsLen > 10 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
+                          ;
+                          ( LvlsLen =:= 2 ->
+                                Clrs = [ClrW,ClrM]
+                                ;
+                                Lim is LvlsLen - 1,
+                                length( RedClrs, Lim ),
+                                once( append(_,RedClrs,Reds) ),
+                                Clrs = [ClrW|RedClrs]
+                          )
+        )
+        ;
+        ( LvlsLen > 9 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
+                         ; 
+                         length( Clrs, LvlsLen ),
+                         once( append(_,Clrs,Reds) )
+        )
+    ).
+
+mtx_mut_hmap_clr_value( false, Mut, Mfc ) :-
+     Mfc = Mut.
+mtx_mut_hmap_clr_value( true, Mut, +(Mfc) ) :-
+     %  mutation = 1, background 0
+     %  however, we allow for other values as there might be other discrete values in the dataset
+     %  thus we interpret 0 as background and mutI for each value > 0
+     ( Mut =:= 0 ->   % 22.03.19 this used to be Mut < 1, which is probably more correct if we
+                      % we insist that this a mutational matrix (AsMut==true), even if there are negative
+                      % numbers in the matrix. 
+                      % This impelentation is "better" in highlighting something is gone wrong, so it is left in
+          Mfc = background 
+          ;
+          ( Mut =:= 1 -> 
+               Mfc = mutation
+               ;
+               atom_concat( mutation, Mut, Mfc )
+          )
     ).
 
 mtx_mut_hmap_save( Opts ) :-

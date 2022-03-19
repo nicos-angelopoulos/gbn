@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    22.03.19   IFACE:   gbn_fam_hmaps/1, mtx_mut_hmap/2: support for non-mutational datasets
     22.03.18   FIXED:   gbn_fisher_nets/1: options were not passed to gbn_fisher_net/4
     22.02.18   OPT:     mtx_mut_hmap/2: legend_{show,font_size} controling legends
     22.02.16   OPT:     gg_muts_by_pnms/3: new plot_{title,leg_title,save_width}
