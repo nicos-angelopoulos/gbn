@@ -13,6 +13,7 @@
                     gbn_svg_legend/1
                     ]  ).
 
+:- use_module(library(csv)).
 :- use_module(library(lib)).
 :- lib(source(gbn), homonyms(true)).
 
