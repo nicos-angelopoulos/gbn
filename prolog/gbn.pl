@@ -14,6 +14,7 @@
                     ]  ).
 
 :- use_module(library(csv)).
+:- use_module(library(pio)).
 :- use_module(library(lib)).
 :- lib(source(gbn), homonyms(true)).
 
