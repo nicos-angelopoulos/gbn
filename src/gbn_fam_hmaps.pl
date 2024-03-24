@@ -71,7 +71,7 @@ gbn_fam_hmaps( Args ) :-
 gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     % Width is  ( ( ( Ldl // 200 ) + 1 ) * 200 *Cwidth ) + 200,  % fixme: Cwidth
     os_path( Dir, GoBnF, GoBnP ),
-    debug( gbn(fam_hmaps), 'Family heatmaps for file: ~p', GoBnP ),
+    debuc( gbn(fam_hmaps), 'Family heatmaps for file: ~p', GoBnP ),
     gbn_term( GoBnP, GoBnPrv, _Ado ),
     os_ext( bn, Stem, GoBnP ),
     atomic_list_concat( [Stem,fams], '_', FamsD ),
@@ -145,7 +145,7 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     os_ext( csv, GatesStemBF, GatesBF ),
     atomic_list_concat( [Stem,multi,prns], '_', MultiPrnsStem ),  % was MultiFamStem
     ( Plvs == [] ->
-        debug( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', true )
+        debuc( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', true )
         ;
         % fixme: this will break if Outs is not an atomic extension...
         multi_cow_plot( Plvs, [stem(MultiPrnsStem),ext(Outs),labels(lower)|Opts] )
