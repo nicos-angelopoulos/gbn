@@ -24,7 +24,7 @@ dot_spit( dot(Strict,Gtype,Id,Stmts) ) -->
 dot_spit_statements( [] ) --> "".
 dot_spit_statements( [H|T] ) -->
 	"\t",
-	{ debug(dot_write, 'Statement:~w', H )},
+	{ debuc(dot_write, 'Statement:~w', H )},
 	dot_spit_statement( H ),
 	";\n",
 	dot_spit_statements( T ).
