@@ -12,7 +12,7 @@
 % @see http://www.graphviz.org/doc/info/lang.html
 %
 dot_read( File, Graph ) :-
-	debug( dot(file), 'Reading from file: ~w', File ),
+	debuc( dot(file), 'Reading from file: ~w', File ),
 	phrase_from_file( graph(Graph), File, [] ),
     !.
 
@@ -24,7 +24,7 @@ graph( dot(Strict,GType,Id,Stmts) ) -->
 
 dot_stmt_list( [Stmt|Stmts] ) --> 
 	dot_stmt( Stmt ),
-	{ debug(dot(statm), 'Read in statement: ~w', [Stmt] ) },
+	{ debuc(dot(statm), 'Read in statement: ~w', [Stmt] ) },
 	% { (Stmt = edge([[101,120,101,99,117,116,101]|_],[]) -> trace; true) },
 	dot_stmt_list_separated( Stmts ).
 
@@ -64,7 +64,7 @@ dot_subgraph( subgraph(Id,Stmts) ) -->
 dot_node_stmt( node(Id,Attrs) ) -->
 	ws, dot_node_id( Id ), ws,
 	dot_attr_list_optional( Attrs ),
-    {debug( dot(node), 'Node: ~w', Id )}.
+    {debuc( dot(node), 'Node: ~w', Id )}.
 
 dot_edge_stmt( edge([Id1|OpIds],Attrs) ) -->
 	ws, dot_edge_id( Id1 ), ws,
