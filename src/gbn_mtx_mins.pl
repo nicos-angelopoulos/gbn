@@ -40,7 +40,7 @@ Opts
 gbn_mtx_mins( MtxIn, Files, Args ) :-
     options_append( gbn_mtx_mins, Args, Opts ),
     gbn_mtx_mins_gen( Files, Mins, Opts ),
-    debug( gbn(mtx_mins), 'gbn mins: ~w', [Mins] ),
+    debuc( gbn(mtx_mins), 'gbn mins: ~w', [Mins] ),
     mtx( MtxIn, Mtx, convert(true) ),
     mtx_lists( Mtx, Lists ),
     max_list( Mins, MaxMin ),

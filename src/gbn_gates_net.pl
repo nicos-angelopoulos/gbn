@@ -61,7 +61,7 @@ gbn_gates_net( DotF, Args ) :-
     options( out(OutF), Opts ),
     % gbn_dot_postfix_ext_file( DotF, gated, dot, false, false, OutF ),
     os_base_postfix_ext_new( DotF, gated, dot, false, OutF ),
-    debug( gbn(gates_net), 'Picking up csv file: ~p', [GatesF] ),
+    debuc( gbn(gates_net), 'Picking up csv file: ~p', [GatesF] ),
     % ( GatesF == 'dutch_driver_muts_min15-18.03.01/dutch_driver_muts_min15-e1_gates_best.csv' -> spy(gbn_dot_gate_add) ; true ),
     options( format(Fmt), Opts ),
     options( directed(Drc), Opts ),
@@ -142,14 +142,14 @@ gbn_dot_gated( [VarsRow,GateRow|T], Dot, Drc, Etheme, CntLG, Gated ) :-
     % GateRow = row(_,_,_Dir,_Pv,_LgR,GateAtm),
     arg( 6, GateRow, GateAtm ),
     term_to_atom( Gate, GateAtm ),
-    debug( gbn(gates_net), 'Vars: ~w. Gate: ~w', [Vars,Gate] ),
-    debug( gbn(gates_net), 'GateAtm: ~w', [GateAtm] ),
+    debuc( gbn(gates_net), 'Vars: ~w. Gate: ~w', [Vars,Gate] ),
+    debuc( gbn(gates_net), 'GateAtm: ~w', [GateAtm] ),
     gbn_dot_gate( Vars, Gate, GateRow, Dot, Drc, Etheme, CntLG, MidDot, NxtLG ),
     gbn_dot_gated( T, MidDot, Drc, Etheme, NxtLG, Gated ).
 
 gbn_dot_gate( [Child|Pas], Gate, GateRow, Graph, Drc, Etheme, CntLG, NxtGraph, NxtLG ) :-
     gbn_dot_edges_sel( Pas, Child, Graph, Drc, RedGraph, SelEs ),
-    debug( gbn(gates_net), 'Child: ~w. Parents: ~w. Sel.Edges: ~w', [Child,Pas,SelEs] ),
+    debuc( gbn(gates_net), 'Child: ~w. Parents: ~w. Sel.Edges: ~w', [Child,Pas,SelEs] ),
     Gate =.. [Gn|GArgs],
     gbn_dot_gate_add( Gn, GArgs, GateRow, Pas, Child, RedGraph, Drc, Etheme, SelEs, CntLG, NxtGraph, Rangles, NxtLG ),
     ( Rangles == [] -> true; throw( remaining_dangles(Rangles) ) ).

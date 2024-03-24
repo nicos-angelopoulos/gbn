@@ -192,11 +192,11 @@ gbn_svg_line_segs_bs( B1, B2, B3 ) :-
  
 svg_add_lines_compos( [], _File, _Xi, _Xt, Yi, MaX, _Dir, MaX/Yi, [] ).
 svg_add_lines_compos( [C|Cs], File, Xi, Xt, Yi, CurMaX, Dir, Max, [Lns|TLns] ) :-
-    debug( gbn(gbn), 'Adding compo: ~w', C ),
+    debuc( gbn(gbn), 'Adding compo: ~w', C ),
     ( svg_add_lines_compo( C, File, Xi, Xt, Yi, CurMaX, IncY, NxtMaX, Lns ) ->
         true
         ;
-        debug( gbn(gbn), 'failed compo: ~w', C ),
+        debuc( gbn(gbn), 'failed compo: ~w', C ),
         Lns = [],
         IncY is 0,
         NxtMaX is CurMaX
@@ -278,7 +278,7 @@ svg_add_lines_compo( node, _File, Xi, Xt, Yi, CurMaX, 20, NxtMaX, [G,H] ) :-
     L4 = '# events (shown med=', L3b = ',max=', L3c = ')',
     % svg_dat_file( File, DatFile ),
     gbn_res_dir_dat_file( '.', DatFile ),
-    debug( gbn(gbn), 'dat.file(~p).', DatFile ),
+    debuc( gbn(gbn), 'dat.file(~p).', DatFile ),
     mtx( DatFile, DatMtx, [sep(0' ),convert(true)] ),
     mtx_value_column_frequencies( DatMtx, 1, Freqs ),
     kv_decompose( Freqs, _Lbls, Times ),
