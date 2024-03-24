@@ -71,7 +71,7 @@ Options is a term or list of:
 */
 gbn( Args ) :-
 	options_append( gbn, Args, All, [process(debug),debug(true),module(gbn)] ),
-	debug( gbn(gbn), 'Options: ~w', [All] ),
+	debuc( gbn(gbn), 'Options: ~w', [All] ),
 	selectchk( data(Dfile), All, NtAll ),
 	absolute_file_name( Dfile, AbsDfile ),
 	file_base_name( AbsDfile, DBname ),
@@ -89,7 +89,7 @@ gbn( Args ) :-
                     _ ),
 	% rename_file( SetsF, Dir ),
 
-	debug( gbn(gbn), 'Output directory: ~p', [Dir] ),
+	debuc( gbn(gbn), 'Output directory: ~p', [Dir] ),
 	working_directory( Old, Dir ),
 	gob_prob_name_settings( ProbName, DBname, SetsF, All ),
 	gbn_multiples( ProbName, DBname, SetsF, NpAll ),
@@ -97,7 +97,7 @@ gbn( Args ) :-
 	working_directory( _, Old ).
 
 gbn_singleton( ProbName, DBname, SetsF, All ) :-
-	debug( gbn(gbn), 'Settings on: ~w', SetsF ),
+	debuc( gbn(gbn), 'Settings on: ~w', SetsF ),
 	atomic_list_concat( ['-g=',SetsF], Garg ),
 	selectchk( std_output(Sout), All, _NsAll ),
 	std_output_gobnilp( Sout, Garg, ProbName, DBname ),
