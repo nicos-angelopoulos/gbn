@@ -153,7 +153,7 @@ gbn_fisher_net( DatF, BnF, DotF ) :-
     gbn_fisher_net( DatF, BnF, DotF, [] ).
 
 gbn_fisher_net( DatF, BnF, DotF, Args ) :-
-    debug( gbn(fisher_net), 'Going fishing with: ~p, ~p and ~p', [DatF,BnF,DotF] ),
+    debuc( gbn(fisher_net), 'Going fishing with: ~p, ~p and ~p', [DatF,BnF,DotF] ),
     options_append( gbn_fisher_net, Args, Opts ),
     options( adjust(Adj), Opts ),
     gbn_fisher_metrics( DatF, Adj, PrvDataPl, IntDfRv, PvalsIntRv, PvalsRv, OddsRv ),
@@ -171,7 +171,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     % debug( gbn(fisher_net), 'Nodes attrs: ~w', [NAttrs] ),
 
     gbn_term( BnF, Bn, _ ),
-    debug( gbn(fisher_net), 'Bn read from file: ~p, is: ~w', [BnF,Bn] ),
+    debuc( gbn(fisher_net), 'Bn read from file: ~p, is: ~w', [BnF,Bn] ),
     maplist( gbn_fisher_family_metrics(PvalsRv,OddsRv), Bn, MeTripsPrv ),
     flatten( MeTripsPrv, MeTrips ),
     memberchk( edge_metrics(MeTrips), Opts ),
@@ -207,7 +207,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     os_postfix( fisher, FisFPrv, FisF ),
     gbn_fisher_if( FisF, GbnG, Fraph, NAttrs, FAttrsNest, Opts ), 
     maplist( <<-, [IntDfRv,PvalsIntRv,PvalsRv,OddsRv] ),
-    debug( gbn(fisher_net), 'Done fishing for: ~p', BnF ).
+    debuc( gbn(fisher_net), 'Done fishing for: ~p', BnF ).
 
 /** gbn_fisher_metrics( +DatF, +BnF, +Adj, -PrvDataPl, -RGbnDf, -RGbnIn, -PvalsRv, -OddsRv ).
 
@@ -217,7 +217,7 @@ gbn_fisher_metrics( DatF, Adj, PrvDataPl, RGbnDf, RGbnIn, PvalsRv, OddsRv ) :-
     length( PrvDataPl, DataNofRows ),
     PrvDataPl = [DataPlHdr,_|TDataPl],
     functor( DataPlHdr, _, Arity ),
-    debug( gbn(fisher_net), 'Data read from: ~p, has ~d rows and ~d columns', [DatF,DataNofRows,Arity] ),
+    debuc( gbn(fisher_net), 'Data read from: ~p, has ~d rows and ~d columns', [DatF,DataNofRows,Arity] ),
     DataPl = [DataPlHdr|TDataPl], % fixme: debugging only???
     assert( data_fishing(DataPl) ),
     RGbnDf = gbn_df,
@@ -303,7 +303,7 @@ gbn_fisher_node_dot_edges( Ew, BHsR, Odds, DwClr, UpClr, RwNms, Nd-_, Nd-Fam, At
 gbn_fisher_if( FisF, _GbnG, _Fraph, _NAttrs, _FAttrsNest, _Opts ) :-
     exists_file( FisF ),
     !,
-    debug( gbn(fisher_net), 'Skipping existing Fisher file: ~p', FisF ).
+    debuc( gbn(fisher_net), 'Skipping existing Fisher file: ~p', FisF ).
 gbn_fisher_if( FisF, Goal, Fraph, NAttrs, FAttrsNest, Opts ) :-
     % os_ext( _, FisS, PsfxFisF ),
     call( Goal ),
