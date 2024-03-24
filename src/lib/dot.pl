@@ -23,19 +23,19 @@ pupsh dot format=Fmt *rvr.tod
 */
 
 dot( ArgS ) :-
-    options_append( dot, ArgS, Opts, atoms(Files) ),
-    options( format(Fmt), Opts ) ,
-	debug( dot, 'Format: ~w', [Fmt] ),
-	maplist( dot_file(Fmt), Files ).
+     options_append( dot, ArgS, Opts, atoms(Files) ),
+     options( format(Fmt), Opts ) ,
+     debuc( dot, 'Format: ~w', [Fmt] ),
+     maplist( dot_file(Fmt), Files ).
 
 dot_file( Frm, File ) :-
-	file_name_extension( Stem, _Dot, File ),
-	file_name_extension( Stem, Frm, PngF ),
-	atom_concat( '-T', Frm, TFrm ),
-	debug( dot, 'Doting file: ~w, onto: ~w', [File,PngF] ),
-    AbsG = absolute_file_name( path(dot), _DotBin, [access(execute),file_errors(fail)] ),
-    ( AbsG ->
-	    process_create( path(dot), [TFrm,'-o',PngF,File], [] )
-        ;
-        print_message( informational, gbn(exec_miss(dot,'cannot create net',File)) )
-    ).
+     file_name_extension( Stem, _Dot, File ),
+     file_name_extension( Stem, Frm, PngF ),
+     atom_concat( '-T', Frm, TFrm ),
+     debuc( dot, 'Doting file: ~w, onto: ~w', [File,PngF] ),
+     AbsG = absolute_file_name( path(dot), _DotBin, [access(execute),file_errors(fail)] ),
+     ( AbsG ->
+         process_create( path(dot), [TFrm,'-o',PngF,File], [] )
+         ;
+         print_message( informational, gbn(exec_miss(dot,'cannot create net',File)) )
+     ).
