@@ -2,6 +2,8 @@
 --------------------
 
 0.3
+    24.04.02   DEPS:    lib(r(ggplot2)) in module file & library(process) (process_create/3)
+               ADDED:   limitsize='FALSE' to ggsave()
     24.03.23   DEPS:    load library(csv) on the main module file
                FIXED:   started switching messages from debug/3 to debuc/3
     22.03.19   IFACE:   gbn_fam_hmaps/1, mtx_mut_hmap/2: support for non-mutational datasets

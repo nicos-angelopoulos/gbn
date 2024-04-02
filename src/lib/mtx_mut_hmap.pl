@@ -258,7 +258,7 @@ mtx_mut_hmap_save_on_opts( Stem, Ext, Opts ) :-
     memberchk( height=Height, Opts ),
     memberchk( width=Width, Opts ),
     memberchk( dpi=Dpi, Opts ),
-    <- ggsave( +File, height=Height, width=Width, units="mm", dpi=Dpi ).
+    <- ggsave( +File, height=Height, width=Width, units="mm", dpi=Dpi, limitsize='FALSE' ).
 
 mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ) :-
     ( string(LegPos) -> atom_string( AtmLegPos, LegPos ) ; AtmLegPos = LegPos ),

@@ -15,6 +15,8 @@
 
 :- use_module(library(csv)).
 :- use_module(library(pio)).
+:- use_module(library(process_create)).
+
 :- use_module(library(lib)).
 :- lib(source(gbn), homonyms(true)).
 
@@ -27,6 +29,8 @@
 :- lib(debug_call).
 :- lib(stoics_lib).
 :- lib(suggests(svg)).
+
+:- lib(r(ggplot2)).
 
 :- lib(gbn/1).
 :- lib(gbn_module/0).
