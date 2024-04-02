@@ -1,6 +1,6 @@
 
-:- lib( real ).
-:- debug( fish ).
+:- lib(real).
+:- debuc(fish).
 
 /** fisher.
 
@@ -32,8 +32,8 @@ fisher :-
 
 repo( Rvar, V1, V2 ) :-
 	Rvar <- fisher.test(V1,V2),
-	debug( fish, 'Rvar: ~w', Rvar ),
+	debuc( fish, 'Rvar: ~w', Rvar ),
 	<- Rvar,
 	Pval <- Rvar$p.val,
 	Estim<- Rvar$estimate,
-	debug( fish, 'pval:~w, estim:~w', [Pval,Estim] ).
+	debuc(fish, 'pval:~w, estim:~w', [Pval,Estim]).

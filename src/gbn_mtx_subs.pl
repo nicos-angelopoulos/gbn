@@ -22,7 +22,7 @@ gbn_mtx_subs( MtxIn, Pred, Args ) :-
     os_dir_stem_ext( data, Name, csv, CsvF ),
     mtx( CsvF, BnMtx ),
     gbn_mtx_dat( CsvF, DatF ),
-    debug( gbn(mtx_subs), 'DatF: ~p', DatF ),
+    debuc( gbn(mtx_subs), 'DatF: ~p', DatF ),
     numlist( 1, 10, ToTen ),
     os_path( Res, Name, ThisRes ),
     gbn( [dir(ThisRes),data(DatF),multiple(edge_penalty,ToTen)] ),
