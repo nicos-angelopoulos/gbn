@@ -4,7 +4,7 @@
 % :- lib(disp_bn).
 % :- lib(stoics_lib:kv_decompose/3).
 
-:- lib(cross_column_fisher_test/6).
+:- lib(cross_column_fisher_test/7).
 :- lib(gbn_mtx_df/6).
 :- lib(r("RColorBrewer")).
 
@@ -55,7 +55,8 @@ gbn_fisher_net_defaults( Args, Defs ) :-
             dashed(Dashed),
             edge_width(Ew),
             node_pen_width(Nw),
-            edge_metrics(_)   % return value option
+            edge_metrics(_),  % return value option
+            sim_pv(false)
         ],
     ( memberchk(clr_theme(Theme),Args) -> true; Theme = DefTheme ),
     ( Theme == DefTheme -> Psfx = ''; Psfx = Theme ),
@@ -140,6 +141,9 @@ Opts
     postfix for the output file (postfixing input). Defaults to '' if Theme == org
     and to the Theme otherwise
 
+  * sim_pv(SimPv=false)
+    whether to use Monte Carlo to simulate p value (see fisher.test())
+
 Requires pack(real) with RcolorBrewer installed.
 
 @author nicos angelopoulos
@@ -156,7 +160,9 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     debuc( gbn(fisher_net), 'Going fishing with: ~p, ~p and ~p', [DatF,BnF,DotF] ),
     options_append( gbn_fisher_net, Args, Opts ),
     options( adjust(Adj), Opts ),
-    gbn_fisher_metrics( DatF, Adj, PrvDataPl, IntDfRv, PvalsIntRv, PvalsRv, OddsRv ),
+    options( sim_pv(SimPvPrv), Opts ),
+    once( gbn_boolean_false_def(SimPvPrv,SimPv) ),
+    gbn_fisher_metrics( DatF, Adj, PrvDataPl, IntDfRv, SimPv, PvalsIntRv, PvalsRv, OddsRv ),
 
     options( clr_co(Cco), Opts ),
     options( clr_co_signif(Ccs), Opts ),
@@ -212,7 +218,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
 /** gbn_fisher_metrics( +DatF, +BnF, +Adj, -PrvDataPl, -RGbnDf, -RGbnIn, -PvalsRv, -OddsRv ).
 
 */
-gbn_fisher_metrics( DatF, Adj, PrvDataPl, RGbnDf, RGbnIn, PvalsRv, OddsRv ) :-
+gbn_fisher_metrics( DatF, Adj, PrvDataPl, RGbnDf, SimPv, RGbnIn, PvalsRv, OddsRv ) :-
     csv_read_file( DatF, PrvDataPl, [separator(0' )] ),
     length( PrvDataPl, DataNofRows ),
     PrvDataPl = [DataPlHdr,_|TDataPl],
@@ -228,7 +234,7 @@ gbn_fisher_metrics( DatF, Adj, PrvDataPl, RGbnDf, RGbnIn, PvalsRv, OddsRv ) :-
     NoClm  <- ncol(RGbnDf),
     RGbnIn <- matrix( ncol=NoClm, nrow=NoClm ),
     OddsRv <- matrix( ncol=NoClm, nrow=NoClm ),
-    cross_column_fisher_test( 1, 1, NoClm, RGbnDf, RGbnIn, OddsRv ),
+    cross_column_fisher_test( 1, 1, NoClm, RGbnDf, SimPv, RGbnIn, OddsRv ),
     rownames( RGbnIn ) <- colnames( RGbnDf ),
     colnames( RGbnIn ) <- colnames( RGbnDf ),
     os_ext( bh, RGbnIn, PvalsRv ),
@@ -370,3 +376,7 @@ gbn_gate_simplify( o(A,o(B,C)), o(A,B,C) ) :- !.
 gbn_gate_simplify( a(A,a(B,C)), a(A,B,C) ) :- !.
 gbn_gate_simplify( x(A,x(B,C)), x(A,B,C) ) :- !.
 gbn_gate_simplify( A, A ).
+
+gbn_boolean_false_def(true, 'TRUE').
+gbn_boolean_false_def('TRUE', 'TRUE').
+gbn_boolean_false_def(_, 'FALSE').
