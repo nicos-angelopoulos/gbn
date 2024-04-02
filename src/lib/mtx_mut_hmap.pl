@@ -168,7 +168,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
                     , legend.title=element_blank()    % removes legend title
                     , panel.grid.major = element_blank(), panel.grid.minor = element_blank()
                     , panel.background = element_blank()
-                    , panel.margin= unit(c(2,2,2,2), "cm")
+                    , panel.spacing= unit(2,"cm")
                   )
           + guides(fill = guide_legend(order = 2, keywidth = 0.8, keyheight = 1.6, 
                                 label.theme = element_text(size = LegFntSz,face = "italic",angle = 0)
