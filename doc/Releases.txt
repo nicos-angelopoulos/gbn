@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    24.04.30   DEPS:    library(apply) [maplist/3,etc], library(filesex) directory_file_path/3
     24.04.02   DEPS:    lib(r(ggplot2)) in module file & library(process) (process_create/3)
                ADDED:   limitsize='FALSE' to ggsave()
     24.03.23   DEPS:    load library(csv) on the main module file
