@@ -100,6 +100,7 @@ Opts
 @author  nicos angelopoulos
 @version 0.1 2017/02/14
 @version 0.2 2022/03/19, support non-mutational hmaps
+@version 0.3 2024/05/08, reduce PL <- R interactions around hclust()
 @tbd     make default rvar a non-existant variable
 
 */
@@ -121,11 +122,14 @@ mtx_mut_hmap( MtxIn, Args ) :-
     Rvar <- Rtx,
     rownames(Rvar) <- Rwns,
     mtx_mut_hmap_cluster( Hcl, Rvar ),
+    % mtx_mut_hmap_cluster( false, Rvar ),
     Nr <- nrow(Rvar),
     Nc <- ncol(Rvar),
     Rwms <- rownames(Rvar),
     atomic_list_concat( [Rvar,df], '_', Df ),
     Df <- data.frame( x=integer(), y=character(), m=character(), stringsAsFactors='FALSE' ),
+    % fixme: convert this to a recursion
+    % there is a version in $local@ampelos, but is not correct
     findall( _,         (   nth1(Rn,Rwms,Rwm),
                             between(1,Nc,Cn),
                             Ri is ((Rn - 1) * Nc ) + Cn,
@@ -178,7 +182,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
     findall( Gp, member(TickSize,[YtX,YtC]), [GpX,GpC] ),
     options_call( x11(true), real:(<-(print(GpX))), Opts ),
     Height is (10 * (Nr + 1)) + LYpad,
-    Width  is max( 20 + (Nc/4) + LXpad, 70 ),
+    Width  is min( max( 20 + (Nc/4) + LXpad, 70 ), 1024 ),
     append( Opts, [height(Height),width(Width),dpi(300)], SaveOpts ),
     mtx_mut_hmap_save( SaveOpts ),
     ( memberchk(plot(Plot),Opts) ->
@@ -265,15 +269,20 @@ mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ) :-
     downcase_atom( AtmLegPos, LowLegPos ),
     mtx_mut_hmap_leg_pads_atom( LowLegPos, LXpad, LYpad, ActLegPos ).
 
-mtx_mut_hmap_leg_pads_atom( false,  0,  0,  false ).
-mtx_mut_hmap_leg_pads_atom( bottom, 0,  8, bottom ).
-mtx_mut_hmap_leg_pads_atom( top,    0,  8, bottom ).
-mtx_mut_hmap_leg_pads_atom( left,  30,  0,   left ).
-mtx_mut_hmap_leg_pads_atom( right, 30,  0,  right ).
-mtx_mut_hmap_leg_pads_atom( true, X, Y, Act ) :-
+mtx_mut_hmap_leg_pads_atom(false,  0,  0,  false).
+mtx_mut_hmap_leg_pads_atom(bottom, 0,  8, bottom).
+mtx_mut_hmap_leg_pads_atom(top,    0,  8, bottom).
+mtx_mut_hmap_leg_pads_atom(left,  30,  0,   left).
+mtx_mut_hmap_leg_pads_atom(right, 30,  0,  right).
+mtx_mut_hmap_leg_pads_atom(true, X, Y, Act) :-
     mtx_mut_hmap_leg_pads_atom( bottom, X, Y, Act ).
 
 mtx_mut_hmap_cluster( clms, Rvar ) :-
-    Ord <- hclust( dist(t(Rvar)) )$order,
-    Rvar <- Rvar[*,Ord].
+    rv_tmp_dist <- dist(t(Rvar)),
+    rv_tmp_ord <- hclust(rv_dist)$order,
+    % fixme: the following line i think was responsible for "Killed" crash, when called from a findall/3 call:
+    % Ord <- hclust( dist(t(Rvar)) )$order,
+    Rvar <- Rvar[*,rv_ord],
+    <- remove(rv_tmp_dist),
+    <- remove(rv_tmp_ord).
 mtx_mut_hmap_cluster( false, _Rvar ).

@@ -80,65 +80,8 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     os_make_path( PrnsD ),
     options( outputs(Outs), Opts ),
     gbn_fam_hmaps_order_net( GoBnPrv, GoBn ),
-    findall( [LeadRow,BestRow]-(MmhN-PltN), (
-                  nth1( N, GoBn, Node-Pas ),
-                  findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
-                  \+ (Pas == [], Chs == [] ),
-                  append( Pas, [Node|Chs], Family ),
-                  findall( Row, ( member(ANode,Family), memberchk([ANode|Clm],Dlists),
-                                      Row =.. [row,ANode|Clm]
-                                ),
-                                        AllRows ),
-                  % parents only: 
-                  os_path(FamsD,Node,NodeStem),
-                  os_ext( csv, NodeStem, NodesCsvF ),
-                  options( x11(X11), Opts ),
-                  options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
-                  ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
-                  FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
-                  ( current_predicate(user:display_var_as/2) ->
-                        maplist( change_row_name, AllRows, TmpRows )
-                        ;
-                        AllRows = TmpRows
-                  ),
-                  mtx_mut_hmap( TmpRows, FaOpts ),
-                      Pas \== [],
-                  % fixme: Pas is probably already sorted...
-                  sort( Pas, OPas ),
-                  atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
-                      os_path(PrnsD,PasNodeBase,PasNodeStem),
-                      append( Pas, [Node], PasNodeL ),
-                      findall( Row, ( member(ANode,PasNodeL), memberchk([ANode|Clm],Dlists),
-                                      Row =.. [row,ANode|Clm]
-                                    ),
-                                        PasRows ),
-                  atomic_list_concat( [mmh,N], '_', MmhN ),
-                  ( current_predicate(user:display_var_as/2) ->
-                        maplist( change_row_name, PasRows, TmpPasRows )
-                        ;
-                        PasRows = TmpPasRows
-                  ),
-                  ( memberchk(x11(X11),Opts) ->
-                    PaOpts = [x11(X11),plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
-                    ;
-                    PaOpts = [plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
-                  ),
-                  mtx_mut_hmap( TmpPasRows, PaOpts ),
-                  atomic_list_concat( [plt,N], '_', PltN ),
-                  PltN <- Plot,
-                  gbn_family_gates(Node,Pas,Dlists,Gatrix,Opts),
-                  %
-                  ( Pas = [_] ->
-                    LeadRow = [], BestRow = []
-                    ;
-                    os_postfix( gates, NodesCsvF, GatesF ),
-                    mtx( GatesF, Gatrix ),
-                    Gatrix = [BestRow|_], 
-                    LeadRow=.. [row,Node|Pas]
-                  )
-                    ), 
-                         NestPrs ),
-    kv_decompose( NestPrs, Nest, Nrs ),
+    gbn_fam_hmaps_plots( GoBn, 1, GoBn, Dlists, FamsD, PrnsD, Nest, Nrs, Opts ),
+    % kv_decompose( NestPrs, Nest, Nrs ),
     kv_decompose( Nrs, Mtvs, Plvs ),
     flatten( Nest, LeadsBests ),
     atomic_list_concat( [Stem,gates,best], '_', GatesStemBF ),
@@ -153,6 +96,64 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     maplist( r_remove, Mtvs ),
     maplist( r_remove, Plvs ),
     csv_write_file( GatesBF, LeadsBests, [match_arity(false)] ).
+
+gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _FamsD, _PrnsD, [], [], _Opts ).
+gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,BestRow|LBRs], [MmhN-PltN|MPs], Opts ) :-
+     findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
+     Pas \== [],
+     \+ (Pas == [], Chs == [] ),
+     !,
+     append( Pas, [Node|Chs], Family ),
+     findall( Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows ),
+     % parents only: 
+     os_path( FamsD, Node, NodeStem ),
+     os_ext( csv, NodeStem, NodesCsvF ),
+     options( [outputs(Outs),x11(X11)], Opts ),
+     options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
+     ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
+     FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
+     ( current_predicate(user:display_var_as/2) ->
+                        maplist( change_row_name, AllRows, TmpRows )
+                        ;
+                        AllRows = TmpRows
+     ),
+     mtx_mut_hmap( TmpRows, FaOpts ),
+     % fixme: Pas is probably already sorted...
+     sort( Pas, OPas ),
+     atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
+     os_path(PrnsD,PasNodeBase,PasNodeStem),
+     append( Pas, [Node], PasNodeL ),
+     findall( Row2, (member(ANode2,PasNodeL), memberchk([ANode2|Clm2],Dlists),Row2 =.. [row,ANode2|Clm2]), PasRows ),
+     atomic_list_concat( [mmh,N], '_', MmhN ),
+     ( current_predicate(user:display_var_as/2) ->
+          maplist( change_row_name, PasRows, TmpPasRows )
+          ;
+          PasRows = TmpPasRows
+     ),
+     ( memberchk(x11(X11),Opts) ->
+          PaOpts = [x11(X11),plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+          ;
+          PaOpts = [plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+     ),
+     mtx_mut_hmap( TmpPasRows, PaOpts ),
+     atomic_list_concat( [plt,N], '_', PltN ),
+     PltN <- Plot,
+     gbn_family_gates( Node, Pas, Dlists, Gatrix, Opts ),
+     %
+     ( Pas = [_] ->
+          LeadRow = [], BestRow = []
+          ;
+          os_postfix( gates, NodesCsvF, GatesF ),
+          mtx( GatesF, Gatrix ),
+          Gatrix = [BestRow|_], 
+          LeadRow=.. [row,Node|Pas]
+     ),
+     N1 is N + 1,
+     gbn_fam_hmaps_plots( Bn, N1, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ).
+% fixme: double check this: (also steadfast Orphan ?, also check if J = I is fine ?
+gbn_fam_hmaps_plots( [_Orphan|Bn], I, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ) :-
+     J is I + 1,
+     gbn_fam_hmaps_plots( Bn, J, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ).
 
 gbn_fam_hmaps_order_net( GoBn, Order ) :-
     current_predicate( gbn:hmap_family_order/1 ),

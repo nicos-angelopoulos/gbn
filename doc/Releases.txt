@@ -2,6 +2,9 @@
 --------------------
 
 0.3
+    24.05.08   CHANGED: mtx_mut_hmap/2's PL <-R as was getting "Killed" (around hclust())
+    24.05.05   CHANGED: findall/3 to tail recursion in mtx_mut_hmap/2.
+    24.05.04   CHANGED: gbn_fam_hmaps/1, findall/3 to loop, for efficiency (also capped max width of plot)
     24.04.30   DEPS:    library(apply) [maplist/3,etc], library(filesex) directory_file_path/3
     24.04.02   DEPS:    lib(r(ggplot2)) in module file & library(process) (process_create/3)
                ADDED:   limitsize='FALSE' to ggsave()
