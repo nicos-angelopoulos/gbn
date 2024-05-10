@@ -14,7 +14,8 @@ multi_cow_plot_defaults( Defs ) :-
             stem(multi_cow_plot),
             vjust(0.9),
             % vjust(0.5)   % smaller means higher up, use this with scale 0.96
-            height(_)
+            height(_),
+            x11(true)
             ].
 
 /** multi_cow_plot( +Plvs, +Opts ).
@@ -50,6 +51,8 @@ Opts
 
   * vjust(JustV= -1)
      vertical justification (plot_grid() param.)
+  * x11(true)
+     should we plot via x11() (in theory we never do, but we switch save protocol when this is true)
 
 @author nicos angelopoulos
 @version  0.1 2017/02/15
@@ -76,17 +79,24 @@ multi_cow_plot( Plvs, Args ) :-
     options( [stem(Stem),ext(ExtS)], Opts ),
     options( aspect(Aspect), Opts ),
     options( height(H), Opts ),
+    options( x11(X11), Opts ),
     en_list( ExtS, Exts ),
-    maplist( multi_cow_plot_ext(Stem,Lenvs,Aspect,H,mplot), Exts ),
+    maplist( multi_cow_plot_ext(Stem,Lenvs,Aspect,H,X11,mplot), Exts ),
     r_remove( mplot ).
 
-multi_cow_plot_ext( Stem, Lenvs, Aspect, H, PlotR, Ext ) :-
+multi_cow_plot_ext( Stem, Lenvs, Aspect, H, X11,PlotR, Ext ) :-
     os_ext( Ext, Stem, File ),
     ( var(H) -> H is max( ( ( (Lenvs + 1) // 2 ) * 1.5) * 0.0393701, 30)
               ; true ),
     % W is max( 20 + (Nc/4) + LXpad, 70 ),
     % <- save_plot( +File, mplot, ncol=2, base_height=H, base_width=W ),
-    <- save_plot( +File, PlotR, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' ).
+    ( X11 = false ->
+          X11w is min(H * 1.4,42),
+          <- ggsave( +File, PlotR, height=H, width=X11w, limitsize='FALSE' )
+          ;
+          % fixme: we introduced the above, because this requests x11, which rises error in hpc
+          <- save_plot( +File, PlotR, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' ).
+     ).
 
 multi_cow_plot_labels( LblsTkn, Lnvs, Lbls ) :-
     multi_com_plot_labels_expand_known(LblsTkn,Lnvs,Lbls),

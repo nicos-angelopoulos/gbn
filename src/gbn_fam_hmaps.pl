@@ -47,7 +47,8 @@ Opts:
   * outputs(Outs=png)
     output format(s) - propagates to multi_cow_plot/2 as ext()
   * x11(X11B)
-    defaults to false if SSH_TTY is defined OS variable, and true otherwise; passed to mtx_mut_hmap/2
+    defaults to false if SSH_TTY is defined OS variable, and true otherwise; 
+    passed to mtx_mut_hmap/2 and multi_cow_plot/2
 
 Options are also passed to gbn_family_gates/5 and multi_cow_plot/2.
 
