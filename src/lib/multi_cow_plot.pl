@@ -84,7 +84,7 @@ multi_cow_plot( Plvs, Args ) :-
     maplist( multi_cow_plot_ext(Stem,Lenvs,Aspect,H,X11,mplot), Exts ),
     r_remove( mplot ).
 
-multi_cow_plot_ext( Stem, Lenvs, Aspect, H, X11,PlotR, Ext ) :-
+multi_cow_plot_ext( Stem, Lenvs, Aspect, H, X11, PlotR, Ext ) :-
     os_ext( Ext, Stem, File ),
     ( var(H) -> H is max( ( ( (Lenvs + 1) // 2 ) * 1.5) * 0.0393701, 30)
               ; true ),
@@ -95,7 +95,7 @@ multi_cow_plot_ext( Stem, Lenvs, Aspect, H, X11,PlotR, Ext ) :-
           <- ggsave( +File, PlotR, height=H, width=X11w, limitsize='FALSE' )
           ;
           % fixme: we introduced the above, because this requests x11, which rises error in hpc
-          <- save_plot( +File, PlotR, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' ).
+          <- save_plot( +File, PlotR, ncol=2, base_height=H, base_aspect_ratio=Aspect, limitsize='FALSE' )
      ).
 
 multi_cow_plot_labels( LblsTkn, Lnvs, Lbls ) :-
