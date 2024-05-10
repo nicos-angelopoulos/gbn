@@ -279,10 +279,10 @@ mtx_mut_hmap_leg_pads_atom(true, X, Y, Act) :-
 
 mtx_mut_hmap_cluster( clms, Rvar ) :-
     rv_tmp_dist <- dist(t(Rvar)),
-    rv_tmp_ord <- hclust(rv_dist)$order,
+    rv_tmp_ord <- hclust(rv_tmp_dist)$order,
     % fixme: the following line i think was responsible for "Killed" crash, when called from a findall/3 call:
     % Ord <- hclust( dist(t(Rvar)) )$order,
-    Rvar <- Rvar[*,rv_ord],
+    Rvar <- Rvar[*,rv_tmp_ord],
     <- remove(rv_tmp_dist),
     <- remove(rv_tmp_ord).
 mtx_mut_hmap_cluster( false, _Rvar ).
