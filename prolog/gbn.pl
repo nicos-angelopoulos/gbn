@@ -16,6 +16,7 @@
 :- use_module(library(csv)).
 :- use_module(library(pio)).
 :- use_module(library(apply)).
+:- use_module(library(lists)).
 :- use_module(library(filesex)).
 :- use_module(library(process)).
 
