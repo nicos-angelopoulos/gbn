@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    24.06.11   DEPS:    library(lists) [selectchk/3]
     24.05.08   CHANGED: mtx_mut_hmap/2's PL <-R as was getting "Killed" (around hclust())
     24.05.05   CHANGED: findall/3 to tail recursion in mtx_mut_hmap/2.
     24.05.04   CHANGED: gbn_fam_hmaps/1, findall/3 to loop, for efficiency (also capped max width of plot)
