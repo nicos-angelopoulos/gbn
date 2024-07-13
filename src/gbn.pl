@@ -1,4 +1,4 @@
-/** gbn_version( -Vers, -Date ).
+/** gbn_version( -Vers, -Date )
 
 Get the current version and publication date.
 
@@ -13,8 +13,8 @@ D = date(2021, 1, 23).
 @version  0.0.1 2014/4/8
 @version  0.1.0 2021/1/19
 @version  0.2.0 2021/1/23
-@see http://stoics.org.uk/~nicos/sware/gbn
-@see http://www.cs.york.ac.uk/aig/sw/gobnilp/
+@see https://stoics.org.uk/~nicos/sware/gbn
+@see https://bitbucket.org/jamescussens/gobnilp
 @tbd control replacement of dot (and other specials?) in Bn var names via options
 
 */
@@ -28,10 +28,10 @@ gbn_defaults( Defs ) :-
 	         std_output(std_file)
 	       ].
 
-gbn :-
-	gbn( [] ).
+/** gbn.
+    gbn(Options).
 
-/** gbn( Options ).
+Run a GOBNILP, Bayesian networks (BNs) learning task and/or post-run routines on learning output.
 
 Options is a term or list of:
 
@@ -64,11 +64,16 @@ Options is a term or list of:
 
 @author nicos angelopoulos
 @version  0.1 2014/4/8
+@version  0.2 2021/1/23
 @tbd  subdirs option (ie non flat run dirs)
 @tbd  bootstraps
 @tbd  hook on to the c-code  (see pack(gob))
 
 */
+
+gbn :-
+	gbn( [] ).
+
 gbn( Args ) :-
 	options_append( gbn, Args, All, [process(debug),debug(true),module(gbn)] ),
 	debuc( gbn(gbn), 'Options: ~w', [All] ),

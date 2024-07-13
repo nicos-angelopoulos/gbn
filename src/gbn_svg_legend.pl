@@ -24,6 +24,7 @@ Opts
   See svg_legend/1.
 
 ==
+?-
 ==
 
 @author nicos angelopoulos

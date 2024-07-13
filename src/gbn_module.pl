@@ -1,17 +1,46 @@
 /** <module> Running and managing runs of gobnilp.
 
-	Run the BN learning algorithm gobnilp.
 
-	Assumes gobnlip is in your path. Currently only tested on *nix based systems.
+Run a GOBNILP, Bayesian networks (BNs) learning task and/or post-run routines on learning output.
+
+Post processing includes the generation of Fisher based visualisation and family heatmaps.<br>
+Assumes gobnlip is in your path. Currently only tested on *nix based systems.
+
+---++ Installation
+
+To install
+==
+?- pack_install(gbn).
+==
+
+to load
+==
+?- use_module(library(gbn)).
+==
+
+---++ Predicates
+
+Main predicate for both running the BN experiment and post-processing is:
+  * gbn/1
+
+---++ Examples
+
+==
+?- gbn.
+true.
+
+?- ls.
+% asia-24.07.13/   
+true.
+==
 
 ==
 ?- gbn(debug(true)).
 % Turning debugging on for predicate handle: gbn(gbn)
 % Options: [$restore(gbn,debug,false),copy(false),data(pack(gbn/data/asia.dat)),display_dot(svg),odir(_33202),std_output(std_file)]
-% Output directory: 'asia-20.09.27'
+% Output directory: 'asia-24.07.13'
 % Settings on: asia.set
 true.
-
 ==
 
 A more complex example
@@ -34,7 +63,15 @@ Abs = '/home/nicos/.local/share/swi-prolog/pack/gbn/run/gbns_in_cancer'.
 true.
 ==
 
+---++ Info
 @author nicos angelopoulos
+@version  0.0.1 2014/4/8
+@version  0.1.0 2021/1/19
+@version  0.2.0 2021/1/23
+@see https://doi.org/10.1038/s42003-022-03243-w
+@see https://stoics.org.uk/~nicos/sware/gbn
+@see https://www.cs.york.ac.uk/aig/sw/gobnilp/
+@see gbn/1
 @see gbn_version/2
 
 */

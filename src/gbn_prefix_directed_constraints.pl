@@ -3,7 +3,7 @@
 
 gbn_prefix_directed_constraints_defaults( bar_contra_self(true) ).
 
-/** gbn_prefix_directed_constraints( +BnVars, +PfxPrs, +OutFile ).
+/** gbn_prefix_directed_constraints( +BnVars, +PfxPrs, +OutFile, +Opts )
 
 For every pair of prefixes in PfxPrs:E-L, write all constrainsts that ban late BnVars (L prefixed)
 from be the parents of early ones (E prefixed).
