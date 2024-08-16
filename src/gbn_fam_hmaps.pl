@@ -124,8 +124,9 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,Best
      Pas \== [],
      \+ (Pas == [], Chs == [] ),
      !,
-     append( Pas, [Node|Chs], Family ),
-     findall( Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows ),
+     flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
+     gbn_fam_hmaps_rows( Dlists, Family, TmpRows ),
+     % findall(Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows),
      % parents only: 
      os_path( FamsD, Node, NodeStem ),
      os_ext( csv, NodeStem, NodesCsvF ),
@@ -133,24 +134,26 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,Best
      options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
      ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
      FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
-     ( current_predicate(user:display_var_as/2) ->
-                        maplist( change_row_name, AllRows, TmpRows )
-                        ;
-                        AllRows = TmpRows
-     ),
+     % ( current_predicate(user:display_var_as/2) ->
+      %                   maplist( change_row_name, AllRows, TmpRows )
+       %                  ;
+        %                 AllRows = TmpRows
+     % ),
      mtx_mut_hmap( TmpRows, FaOpts ),
      % fixme: Pas is probably already sorted...
      sort( Pas, OPas ),
      atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
      os_path(PrnsD,PasNodeBase,PasNodeStem),
      append( Pas, [Node], PasNodeL ),
-     findall( Row2, (member(ANode2,PasNodeL), memberchk([ANode2|Clm2],Dlists),Row2 =.. [row,ANode2|Clm2]), PasRows ),
+
+     gbn_fam_hmaps_rows( Dlists, PasNodeL, TmpPasRows ),
+     % findall( Row2, (member(ANode2,PasNodeL), memberchk([ANode2|Clm2],Dlists),Row2 =.. [row,ANode2|Clm2]), PasRows ),
      atomic_list_concat( [mmh,N], '_', MmhN ),
-     ( current_predicate(user:display_var_as/2) ->
-          maplist( change_row_name, PasRows, TmpPasRows )
-          ;
-          PasRows = TmpPasRows
-     ),
+     % ( current_predicate(user:display_var_as/2) ->
+          % maplist( change_row_name, PasRows, TmpPasRows )
+          % ;
+          % PasRows = TmpPasRows
+     % ),
      ( memberchk(x11(X11),Opts) ->
           PaOpts = [x11(X11),plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
           ;
@@ -188,3 +191,25 @@ change_row_name( RowIn, RowOut ) :-
     RowIn =.. [Tname,Rname|Args],
     ( user:display_var_as(Rname,Nname) -> true; Rname = Nname ),
     RowOut =.. [Tname,Nname|Args].
+
+gbn_fam_hmaps_rows( [], Rels, Rows ) :-
+    ( Rels == [] ->
+               Rows = []
+               ;
+               throw( could_not_find_heatmap_row_for_relatives(Rel) ).
+    ).
+gbn_fam_hmaps_rows( [L|Ls], Rels, Rows ) :-
+     L = [ANode|Clm],
+     ( select(ANode,Rels,Rems) ->
+               ( user:display_var_as(ANode,Dname) -> true; ANode = Dname ),
+               Row =.. [row,Dname|Clm],
+               Rows = [Row|Tows],
+               ( Rems = [] ->
+                         Ms = []
+                         ;
+                         Ls = Ms
+               )
+               ;
+               Ms = Ls, Tows = Rows, Rems = Rels
+     ),
+     gbn_fam_hmaps_rows( Ms, Rems, Tows ).
