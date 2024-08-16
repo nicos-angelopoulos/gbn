@@ -16,6 +16,7 @@ gbn_fam_hmaps_defaults( Defs ) :-
              col_hmap([]),
              col_mut("#CB181D"),
              col_wt("#08519C"),
+             multi_prns(true),
              outputs(png),
              x11(X11B)
            ],
@@ -23,33 +24,39 @@ gbn_fam_hmaps_defaults( Defs ) :-
 
 /** gbn_fam_hmaps( +Opts ).
 
-Create family heatmaps for all families and all Bns in directory Dir (default is the current directory).
+Create family and parental heatmaps for all families and all Bns in directory Dir (default is the current directory).
 
 Every file ending in .bn is taken to be a (Gobnilp generated) BN. 
-There should be a single .dat file in the directory,
-which is taken to hold the data used to create all BNs (Gobnilp default format).
+There should be a single .dat file in the directory, which is taken to hold
+the data used to create all BNs (Gobnilp default format).
+
+The predicate creates 2 types of heatmaps: parental and family based. Family ones have 
 
 Opts:
   * as_mutational(Bin=true)
-    whether the data contains mutations (when false arbitary integer values are assumed)
+    whether the data contains mutations<br> (when false arbitary integer values are assumed)
   * cellwidth(Cw=1)
     cell width
   * cellheight(Ch=12)
     cell height
   * col_hmap(ClrH=[])
-    list of value-"Colour" for each value in mtx (can contain non mtx values).
+    list of value-"Colour" for each value in mtx (can contain non mtx values).<br>
     If this is given it overrides ClrM and ClrW.
   * col_mut(ClrM="#CB181D")
     colour of mutation
   * col_wt(ClrW="#08519C")
     colour of wild type
+  * debug(Dbg=false)
+    use _gbn(fam_hmaps)_ for high level messages and _gbn(fam_hmaps_fine)_ for finner grain (can use both)
   * dir(Dir='.')
     working directory
+  * multi_prns(MuPrns=true)
+    whether to produce a multi prns plot
   * outputs(Outs=png)
     output format(s) - propagates to multi_cow_plot/2 as ext()
   * x11(X11B)
-    defaults to false if SSH_TTY is defined OS variable, and true otherwise; 
-    passed to mtx_mut_hmap/2 and multi_cow_plot/2
+    defaults to false if SSH_TTY is defined OS variable, and true otherwise.<br>
+    Passed to mtx_mut_hmap/2 and multi_cow_plot/2
 
 Options are also passed to gbn_family_gates/5 and multi_cow_plot/2.
 
@@ -61,6 +68,7 @@ Options are also passed to gbn_family_gates/5 and multi_cow_plot/2.
 gbn_fam_hmaps( Args ) :-
     options_append( gbn_fam_hmaps, Args, Opts ),
     options( dir(Dir), Opts ),
+    debuc( gbn(fam_hmaps), 'Starting family and parental heatmaps in dir: ~p', [Dir] ),
     os_sel( os_files, ext(bn), GoBn, dir(Dir) ),
     gbn_res_dir_dat_file( Dir, DatF ),
     os_path( Dir, DatF, DatP ),
@@ -73,7 +81,7 @@ gbn_fam_hmaps( Args ) :-
 gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     % Width is  ( ( ( Ldl // 200 ) + 1 ) * 200 *Cwidth ) + 200,  % fixme: Cwidth
     os_path( Dir, GoBnF, GoBnP ),
-    debuc( gbn(fam_hmaps), 'Family heatmaps for file: ~p', GoBnP ),
+    debuc( gbn(fam_hmaps), 'Family heatmaps for file: ~p', [GoBnP] ),
     gbn_term( GoBnP, GoBnPrv, _Ado ),
     os_ext( bn, Stem, GoBnP ),
     atomic_list_concat( [Stem,fams], '_', FamsD ),
@@ -89,11 +97,16 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     atomic_list_concat( [Stem,gates,best], '_', GatesStemBF ),
     os_ext( csv, GatesStemBF, GatesBF ),
     atomic_list_concat( [Stem,multi,prns], '_', MultiPrnsStem ),  % was MultiFamStem
+    options( multi_prns(MuPrns), Opts ),
     ( Plvs == [] ->
         debuc( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', true )
         ;
         % fixme: this will break if Outs is not an atomic extension...
-        multi_cow_plot( Plvs, [stem(MultiPrnsStem),ext(Outs),labels(lower)|Opts] )
+        ( MuPrns == false ->
+               debuc( gbn(fam_hmaps), 'Skipping creation of multi parental plot due to flag value.', true )
+               ;
+               multi_cow_plot( Plvs, [stem(MultiPrnsStem),ext(Outs),labels(lower)|Opts] )
+        )
     ),
     maplist( r_remove, Mtvs ),
     maplist( r_remove, Plvs ),
@@ -101,6 +114,7 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
 
 gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _FamsD, _PrnsD, [], [], _Opts ).
 gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,BestRow|LBRs], [MmhN-PltN|MPs], Opts ) :-
+     debuc( gbn(fam_hmaps_fine), 'Node: ~w, with parents: ~w', [Node,Pas] ),
      findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
      Pas \== [],
      \+ (Pas == [], Chs == [] ),
