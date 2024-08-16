@@ -30,7 +30,8 @@ Every file ending in .bn is taken to be a (Gobnilp generated) BN.
 There should be a single .dat file in the directory, which is taken to hold
 the data used to create all BNs (Gobnilp default format).
 
-The predicate creates 2 types of heatmaps: parental and family based. Family ones have 
+The predicate creates 2 types of heatmaps: parental and family based. Family ones includes the children of a node 
+in addition to its parents. Currently the parental heatmaps are also summarised in a single multiplot.
 
 Opts:
   * as_mutational(Bin=true)
@@ -125,7 +126,10 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,Best
      \+ (Pas == [], Chs == [] ),
      !,
      flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
+                                         % fixme: the order is changed later...
+     debuc( gbn(fam_hmaps_fine), 'Getting rows for family: ~w', [Family] ),
      gbn_fam_hmaps_rows( Dlists, Family, TmpRows ),
+     debuc( gbn(fam_hmaps_fine), length, fam_rows/TmpRows ),
      % findall(Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows),
      % parents only: 
      os_path( FamsD, Node, NodeStem ),
@@ -140,6 +144,7 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,Best
         %                 AllRows = TmpRows
      % ),
      mtx_mut_hmap( TmpRows, FaOpts ),
+     debuc( gbn(fam_hmaps_fine), 'Finished heatmap.', [] ),
      % fixme: Pas is probably already sorted...
      sort( Pas, OPas ),
      atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
@@ -196,7 +201,7 @@ gbn_fam_hmaps_rows( [], Rels, Rows ) :-
     ( Rels == [] ->
                Rows = []
                ;
-               throw( could_not_find_heatmap_row_for_relatives(Rel) ).
+               throw( could_not_find_heatmap_row_for_relatives(Rels) )
     ).
 gbn_fam_hmaps_rows( [L|Ls], Rels, Rows ) :-
      L = [ANode|Clm],

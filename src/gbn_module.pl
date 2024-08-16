@@ -1,3 +1,5 @@
+% this has been transferred to prolog/gbn.pl, 28.08.16 SWI now displays all module predicates if that is defined prolog/gbn.pl
+
 /** <module> Running and managing runs of gobnilp.
 
 
