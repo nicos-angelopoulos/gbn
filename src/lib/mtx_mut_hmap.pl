@@ -185,6 +185,7 @@ mtx_mut_hmap( MtxIn, Args ) :-
     Width  is min( max( 20 + (Nc/4) + LXpad, 70 ), 1024 ),
     append( Opts, [height(Height),width(Width),dpi(300)], SaveOpts ),
     mtx_mut_hmap_save( SaveOpts ),
+    % nicos.fixme.delete.me.24.08.16
     ( memberchk(plot(Plot),Opts) ->
         Plot = GpC
         ;

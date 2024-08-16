@@ -16,6 +16,8 @@ gbn_fam_hmaps_defaults( Defs ) :-
              col_hmap([]),
              col_mut("#CB181D"),
              col_wt("#08519C"),
+             plot_fams(true),
+             plot_prns(true),
              multi_prns(true),
              outputs(png),
              x11(X11B)
@@ -56,6 +58,10 @@ Opts:
     whether to produce a multi parental plot
   * outputs(Outs=png)
     output format(s) - propagates to multi_cow_plot/2 as ext()
+  * plot_fams(PtFams=true)
+    enables family heatmap plotting
+  * plot_prns(PtFams=true)
+    enables parents heatmap plotting
   * x11(X11B)
     defaults to false if SSH_TTY is defined OS variable, and true otherwise.<br>
     Passed to mtx_mut_hmap/2 and multi_cow_plot/2
@@ -96,21 +102,23 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     os_make_path( PrnsD ),
     options( outputs(Outs), Opts ),
     gbn_fam_hmaps_order_net( GoBnPrv, GoBn ),
-    gbn_fam_hmaps_plots( GoBn, 1, GoBn, Dlists, FamsD, PrnsD, Nest, Nrs, Opts ),
+    options( plot_fams(PtFams), Opts ),
+    options( plot_prns(PtPrns), Opts ),
+    gbn_fam_hmaps_plots( GoBn, 1, GoBn, Dlists, PtFams/PtPrns, FamsD, PrnsD, Nest, Nrs, Opts ),
     % kv_decompose( NestPrs, Nest, Nrs ),
     kv_decompose( Nrs, Mtvs, Plvs ),
     flatten( Nest, LeadsBests ),
     atomic_list_concat( [Stem,gates,best], '_', GatesStemBF ),
     os_ext( csv, GatesStemBF, GatesBF ),
-    atomic_list_concat( [Stem,multi,prns], '_', MultiPrnsStem ),  % was MultiFamStem
     options( multi_prns(MuPrns), Opts ),
     ( Plvs == [] ->
         debuc( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', true )
         ;
-        % fixme: this will break if Outs is not an atomic extension...
         ( MuPrns == false ->
                debuc( gbn(fam_hmaps), 'Skipping creation of multi parental plot due to flag value.', true )
                ;
+               atomic_list_concat( [Stem,multi,prns], '_', MultiPrnsStem ),
+               % fixme: this will break if Outs is not an atomic extension...
                multi_cow_plot( Plvs, [stem(MultiPrnsStem),ext(Outs),labels(lower)|Opts] )
         )
     ),
@@ -118,55 +126,55 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     maplist( r_remove, Plvs ),
     csv_write_file( GatesBF, LeadsBests, [match_arity(false)] ).
 
-gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _FamsD, _PrnsD, [], [], _Opts ).
-gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,BestRow|LBRs], [MmhN-PltN|MPs], Opts ) :-
+gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _Pts, _FamsD, _PrnsD, [], [], _Opts ).
+gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [LeadRow,BestRow|LBRs], [MmhN-PltN|MPs], Opts ) :-
      debuc( gbn(fam_hmaps_fine), 'Node: ~w, with parents: ~w', [Node,Pas] ),
      findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
      Pas \== [],
      \+ (Pas == [], Chs == [] ),
      !,
-     flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
-                                         % fixme: the order is changed later...
-     debuc( gbn(fam_hmaps_fine), 'Getting rows for family: ~w', [Family] ),
-     gbn_fam_hmaps_rows( Dlists, Family, TmpRows ),
-     debuc( gbn(fam_hmaps_fine), length, fam_rows/TmpRows ),
-     % findall(Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows),
-     % parents only: 
-     os_path( FamsD, Node, NodeStem ),
-     os_ext( csv, NodeStem, NodesCsvF ),
-     options( [outputs(Outs),x11(X11)], Opts ),
-     options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
-     ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
-     FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
-     % ( current_predicate(user:display_var_as/2) ->
-      %                   maplist( change_row_name, AllRows, TmpRows )
-       %                  ;
-        %                 AllRows = TmpRows
-     % ),
-     mtx_mut_hmap( TmpRows, FaOpts ),
-     debuc( gbn(fam_hmaps_fine), 'Finished heatmap.', [] ),
-     % fixme: Pas is probably already sorted...
-     sort( Pas, OPas ),
-     atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
-     os_path(PrnsD,PasNodeBase,PasNodeStem),
-     append( Pas, [Node], PasNodeL ),
-
-     gbn_fam_hmaps_rows( Dlists, PasNodeL, TmpPasRows ),
-     % findall( Row2, (member(ANode2,PasNodeL), memberchk([ANode2|Clm2],Dlists),Row2 =.. [row,ANode2|Clm2]), PasRows ),
-     atomic_list_concat( [mmh,N], '_', MmhN ),
-     % ( current_predicate(user:display_var_as/2) ->
-          % maplist( change_row_name, PasRows, TmpPasRows )
-          % ;
-          % PasRows = TmpPasRows
-     % ),
-     ( memberchk(x11(X11),Opts) ->
-          PaOpts = [x11(X11),plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+     ( PtFs == true ->
+          flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
+                                              % fixme: the order is changed later...
+          debuc( gbn(fam_hmaps_fine), 'Getting rows for family: ~w', [Family] ),
+          gbn_fam_hmaps_rows( Dlists, Family, TmpRows ),
+          debuc( gbn(fam_hmaps_fine), length, fam_rows/TmpRows ),
+          % findall(Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows),
+          % parents only: 
+          os_path( FamsD, Node, NodeStem ),
+          os_ext( csv, NodeStem, NodesCsvF ),
+          options( [outputs(Outs),x11(X11)], Opts ),
+          options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
+          ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
+          FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
+          mtx_mut_hmap( TmpRows, FaOpts ),
+          debuc( gbn(fam_hmaps_fine), 'Finished heatmap.', [] )
+          % fixme: Pas is probably already sorted...
           ;
-          PaOpts = [plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+          debuc( gbn(fam_hmaps_fine), 'Skipping plot for family of: ~w.', [Node] )
      ),
-     mtx_mut_hmap( TmpPasRows, PaOpts ),
-     atomic_list_concat( [plt,N], '_', PltN ),
-     PltN <- Plot,
+     ( PtPs == true ->
+          sort( Pas, OPas ),
+          atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
+          os_path(PrnsD,PasNodeBase,PasNodeStem),
+          append( Pas, [Node], PasNodeL ),
+          debuc( gbn(fam_hmaps_fine), 'Getting rows for parents and child: ~w', [PasNodeL] ),
+          gbn_fam_hmaps_rows( Dlists, PasNodeL, TmpPasRows ),
+          % findall( Row2, (member(ANode2,PasNodeL), memberchk([ANode2|Clm2],Dlists),Row2 =.. [row,ANode2|Clm2]), PasRows ),
+          atomic_list_concat( [mmh,N], '_', MmhN ),
+          ( memberchk(x11(X11),Opts) ->
+               PaOpts = [x11(X11),plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+               ;
+               PaOpts = [plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
+          ),
+          mtx_mut_hmap( TmpPasRows, PaOpts ),
+          atomic_list_concat( [plt,N], '_', PltN ),
+          PltN <- Plot,
+          MPs = [MmhN-PltN|TMPs]
+          ;
+          TMPs = MPs,
+          debuc( gbn(fam_hmaps_fine), 'Skipping plot for parents of: ~w.', [Node] )
+     ),
      gbn_family_gates( Node, Pas, Dlists, Gatrix, Opts ),
      %
      ( Pas = [_] ->
@@ -178,11 +186,13 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, FamsD, PrnsD, [LeadRow,Best
           LeadRow=.. [row,Node|Pas]
      ),
      N1 is N + 1,
-     gbn_fam_hmaps_plots( Bn, N1, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ).
+     !,
+     garbage_collect,
+     gbn_fam_hmaps_plots( Bn, N1, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, LBRs, TMPs, Opts ).
 % fixme: double check this: (also steadfast Orphan ?, also check if J = I is fine ?
-gbn_fam_hmaps_plots( [_Orphan|Bn], I, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ) :-
+gbn_fam_hmaps_plots( [_Orphan|Bn], I, GoBn, Dlists, Pts, FamsD, PrnsD, LBRs, MPs, Opts ) :-
      J is I + 1,
-     gbn_fam_hmaps_plots( Bn, J, GoBn, Dlists, FamsD, PrnsD, LBRs, MPs, Opts ).
+     gbn_fam_hmaps_plots( Bn, J, GoBn, Dlists, Pts, FamsD, PrnsD, LBRs, MPs, Opts ).
 
 gbn_fam_hmaps_order_net( GoBn, Order ) :-
     current_predicate( gbn:hmap_family_order/1 ),

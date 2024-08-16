@@ -3,6 +3,7 @@
 
 0.3
     24.08.16   OPTS:    added multi_prns(MuPrns) boolean
+               OPTS:    added plot_{fams,prns}() in gbn_fam_heatmaps/1
     24.07.13   DOC:     ensure static html for gbn/1 + minor changes
     24.06.11   DEPS:    library(lists) [selectchk/3]
     24.05.08   CHANGED: mtx_mut_hmap/2's PL <-R as was getting "Killed" (around hclust())
