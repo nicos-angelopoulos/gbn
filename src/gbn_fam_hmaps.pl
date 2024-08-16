@@ -47,11 +47,12 @@ Opts:
   * col_wt(ClrW="#08519C")
     colour of wild type
   * debug(Dbg=false)
-    use _gbn(fam_hmaps)_ for high level messages and _gbn(fam_hmaps_fine)_ for finner grain (can use both)
+    use _gbn(fam_hmaps)_ for high level messages and _gbn(fam_hmaps_fine)_ for finner grain.<br>
+    The latter also sets the former. Only the first debug() is observed.
   * dir(Dir='.')
     working directory
   * multi_prns(MuPrns=true)
-    whether to produce a multi prns plot
+    whether to produce a multi parental plot
   * outputs(Outs=png)
     output format(s) - propagates to multi_cow_plot/2 as ext()
   * x11(X11B)
@@ -63,12 +64,16 @@ Options are also passed to gbn_family_gates/5 and multi_cow_plot/2.
 @author nicos angelopoulos
 @version  0.2 2018/02/21
 @tbd add a simple example in examples/
+@tbd multi family plot ?
+@tbd add token to allow multi outputs in same directory
 
 */
 gbn_fam_hmaps( Args ) :-
     options_append( gbn_fam_hmaps, Args, Opts ),
     options( dir(Dir), Opts ),
+    debug_chain( fam_hmaps_fine, fam_hmaps ),
     debuc( gbn(fam_hmaps), 'Starting family and parental heatmaps in dir: ~p', [Dir] ),
+    debuc( gbn(fam_hmaps_fine), 'Starting (finely) family and parental heatmaps in dir: ~p', [Dir] ),
     os_sel( os_files, ext(bn), GoBn, dir(Dir) ),
     gbn_res_dir_dat_file( Dir, DatF ),
     os_path( Dir, DatF, DatP ),
