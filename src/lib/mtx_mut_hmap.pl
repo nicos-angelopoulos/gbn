@@ -29,6 +29,7 @@ mtx_mut_hmap_defaults( Defs ) :-
               legend_font_size(10),
               % outputs: no default
               % plot(true), returns the plot term
+              mtx_read(r),
               rvar(mtx_mut_hmap),
               rvar_rmv(true),
               stem(mtx_mut_hmap),
@@ -75,7 +76,10 @@ Opts
     font size for the legend text
   * mtx(Mtx)
     the input Matrix for the mtx_mut_hmap/1 version.<br>
-    Has no effect on mtx_mut_hmap/2 version.
+    Has no effect on mtx_mut_hmap/2 version. Alternative value: _pl_.
+  * mtx_read(Mfc=r)
+    interface for reading-in the data csv, if Mtx is a file.<br>
+    The default is _true_ but is ignored if Mtx is not a file.
   * outputs(OutS)
     an output or list of outputs, each being either atomic or compound. 
     The functor, or atom, of each output should be an file extension understood by R's ggsave().
@@ -124,15 +128,9 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     options( legend_show(LegShow), Opts ),
     upcase_atom( LegShow, ShowLeg ),
     options( legend_font_size(LegFntSz), Opts ),
-    mtx( MtxIn, Mtx ),
-    findall( Rwn-DtRow, ( member(Row,Mtx), 
-                          Row =.. [Rfun,Rwn|Dt],
-                          DtRow =.. [Rfun|Dt]
-                        ),
-                            RDs ),
-    kv_decompose( RDs, Rwns, Rtx ),
-    Rvar <- Rtx,
-    rownames(Rvar) <- Rwns,
+    options( mtx_read(Mfc), Opts ),
+    mtx_mut_hmap_mtx( Mfc, MtxIn, Rvar ),
+
     mtx_mut_hmap_cluster( Hcl, Rvar ),
     % mtx_mut_hmap_cluster( false, Rvar ),
     Nr <- nrow(Rvar),
@@ -148,7 +146,7 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     % <- print( Df ),
     Rvar <- Df,
     Rvar$y <- as.character(Rvar$y),
-    Rvar$y <- factor(Rvar$y, levels=rev(Rwns)),
+    Rvar$y <- factor(Rvar$y, levels=rev(Rwms)),
     r_remove( Df ),
     options( legend(LegPos), Opts ),
     mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ),
@@ -197,6 +195,21 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
         ;
         options_rvar_rmv( Rvar, Opts )
     ).
+
+mtx_mut_hmap_mtx( r, MtxIn, Rvar ) :-
+    atomic( MtxIn ),
+    !,
+    Rvar <- read.csv( +MtxIn, header='FALSE', row.names=1 ).
+mtx_mut_hmap_mtx( _, MtxIn, Rvar ) :-
+    mtx( MtxIn, Mtx ),
+    findall( Rwn-DtRow, ( member(Row,Mtx), 
+                          Row =.. [Rfun,Rwn|Dt],
+                          DtRow =.. [Rfun|Dt]
+                        ),
+                            RDs ),
+    kv_decompose( RDs, Rwns, Rtx ),
+    Rvar <- Rtx,
+    rownames(Rvar) <- Rwns.
 
 mtx_mut_hmap_df_rows( [], _I, _Nc, _Bin, _Rv, _Df ).
 mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Rvar, Df ) :-
