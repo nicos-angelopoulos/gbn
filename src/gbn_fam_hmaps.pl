@@ -257,7 +257,6 @@ gbn_fam_mut_hmap( os, Rows, OStem, Opts ) :-
                     ),
                          Atoms ),
      atomic_list_concat( [upsh,'gbn:mtx_mut_hmap'|Atoms], ' ', Shell ),
-     write( shell(Shell) ), nl,
      debuc( gbn(fam_hmaps_fine), 'Shellling: ~w', [Shell] ),
      shell( Shell ).
 
