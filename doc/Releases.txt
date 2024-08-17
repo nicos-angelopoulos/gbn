@@ -2,7 +2,7 @@
 --------------------
 
 0.3
-    24.08.16   IFACE:   add a mtx_mut_hmap/1 version, allowing to run as stand alone more easily
+    24.08.16   IFACE:   add a mtx_mut_hmap/1 version and to the module interface
                OPTS:    new mut_hmap_iface(Ifc={pl,os}) in gbn_fam_hmaps/1
     24.08.16   OPTS:    added multi_prns(MuPrns) boolean
                OPTS:    added plot_{fams,prns}() in gbn_fam_heatmaps/1

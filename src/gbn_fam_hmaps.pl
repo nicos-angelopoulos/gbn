@@ -244,9 +244,20 @@ gbn_fam_mut_hmap( os, Rows, OStem, Opts ) :-
      mtx( CsvF, Rows ),
      findall( Atom, (  member(Opt,[mtx(CsvF)|Opts]),
                        (Opt =.. [F,A] -> true; throw(non_uninary_opt_in(Opt))),
-                       atomic_list_concat([F,A],'=',Atom)
+                       ( is_list(A) ->
+                              gbn_fam_mut_hmap_lst_os( A, AAtm )
+                              ;
+                              A = AAtm
+                       ),
+                       atomic_list_concat( [F,AAtm], '=', Atom )
                     ),
                          Atoms ),
-     atomic_list_concat( [upsh|Atoms], Shell ),
-     debuc( gbn(fam_hmaps), 'Shellling: ~w', [Shell] ),
+     trace,
+     atomic_list_concat( [upsh,'gbn:mtx_mut_hmap'|Atoms], ' ', Shell ),
+     debuc( gbn(fam_hmaps_fine), 'Shellling: ~w', [Shell] ),
      shell( Shell ).
+
+gbn_fam_mut_hmap_lst_os( [], 'lst=' ).
+gbn_fam_mut_hmap_lst_os( [H|T], Atm ) :-
+     atomic_list_concat( [H|T], ',', List ),
+     atomic_list_concat( [lst,List], '=', Atm ).

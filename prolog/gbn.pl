@@ -10,7 +10,8 @@
                     gbn_prefix_directed_constraints/4,
                     gbn_gates_nets/0, gbn_gates_nets/1,
                     gbn_gates_net/1,gbn_gates_net/2,
-                    gbn_svg_legend/1
+                    gbn_svg_legend/1,
+                    mtx_mut_hmap/1, mtx_mut_hmap/2
                     ]  ).
 
      
