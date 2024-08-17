@@ -112,10 +112,10 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     os_ext( csv, GatesStemBF, GatesBF ),
     options( multi_prns(MuPrns), Opts ),
     ( Plvs == [] ->
-        debuc( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', true )
+        debuc( gbn(fam_hmaps), 'empty list for multi-plot in gbn_fam_hmaps/1', [] )
         ;
         ( MuPrns == false ->
-               debuc( gbn(fam_hmaps), 'Skipping creation of multi parental plot due to flag value.', true )
+               debuc( gbn(fam_hmaps), 'Skipping creation of multi parental plot due to flag value.', [] )
                ;
                atomic_list_concat( [Stem,multi,prns], '_', MultiPrnsStem ),
                % fixme: this will break if Outs is not an atomic extension...
@@ -127,7 +127,7 @@ gbn_fam_hmaps_dlists( Dir, Dlists, Opts, GoBnF ) :-
     csv_write_file( GatesBF, LeadsBests, [match_arity(false)] ).
 
 gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _Pts, _FamsD, _PrnsD, [], [], _Opts ).
-gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [LeadRow,BestRow|LBRs], [MmhN-PltN|MPs], Opts ) :-
+gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [LeadRow,BestRow|LBRs], MPs, Opts ) :-
      debuc( gbn(fam_hmaps_fine), 'Node: ~w, with parents: ~w', [Node,Pas] ),
      findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
      Pas \== [],
