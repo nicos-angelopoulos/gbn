@@ -113,11 +113,11 @@ mtx_mut_hmap( Args ) :-
     options( mtx(Mtx), Opts ),
     mtx_mut_hmap_opts( Mtx, Opts ).
      
-mtx_mut_hmap( MtxIn, Args ) :-
+mtx_mut_hmap( Mtx, Args ) :-
     options_append( mtx_mut_hmap, Args, Opts, pack(sanger) ),
     mtx_mut_hmap_opts( Mtx, Opts ).
 
-mtx_mut_hmap_opts( Mtx, Opts ) :-
+mtx_mut_hmap_opts( MtxIn, Opts ) :-
     options( as_mutational(Bin), Opts ),
     options( rvar(Rvar), Opts ),
     options( hclust(Hcl), Opts ),

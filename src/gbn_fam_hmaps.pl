@@ -16,10 +16,11 @@ gbn_fam_hmaps_defaults( Defs ) :-
              col_hmap([]),
              col_mut("#CB181D"),
              col_wt("#08519C"),
+             multi_prns(true),
+             mut_hmap_iface(pl),
+             outputs(png),
              plot_fams(true),
              plot_prns(true),
-             multi_prns(true),
-             outputs(png),
              x11(X11B)
            ],
     ( getenv('SSH_TTY',_Shy) -> X11B = false; X11B = true ).
@@ -54,6 +55,8 @@ Opts:
     The latter also sets the former. Only the first debug() is observed.
   * dir(Dir='.')
     working directory
+  * mut_hmap_iface(Ifc=pl)
+    Interface for calling mtx_mut_hmap/1,2. Use _os_ for an external call to upsh via shell/1.
   * multi_prns(MuPrns=true)
     whether to produce a multi parental plot
   * outputs(Outs=png)
@@ -133,6 +136,7 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
      Pas \== [],
      \+ (Pas == [], Chs == [] ),
      !,
+     options( mut_hmap_iface(Ifc), Opts ),
      ( PtFs == true ->
           flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
                                               % fixme: the order is changed later...
@@ -147,8 +151,9 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
           options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
           ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
           FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
-          mtx_mut_hmap( TmpRows, FaOpts ),
-          debuc( gbn(fam_hmaps_fine), 'Finished heatmap.', [] )
+          gbn_fam_mut_hmap( Ifc, TmpRows, NodeStem, FaOpts ),
+          % mtx_mut_hmap( TmpRows, FaOpts ),
+          debuc( gbn(fam_hmaps_fine), 'Finished family heatmap.', [] )
           % fixme: Pas is probably already sorted...
           ;
           debuc( gbn(fam_hmaps_fine), 'Skipping plot for family of: ~w.', [Node] )
@@ -167,7 +172,8 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
                ;
                PaOpts = [plot(Plot),rvar(MmhN),stem(PasNodeStem),outputs(Outs)|ComOpts]    % outputs(png(width=Width,height=FamHeight)),
           ),
-          mtx_mut_hmap( TmpPasRows, PaOpts ),
+          gbn_fam_mut_hmap( Ifc, TmpPasRows, PasNodeStem, PaOpts ),
+          % mtx_mut_hmap( TmpPasRows, PaOpts ),
           atomic_list_concat( [plt,N], '_', PltN ),
           PltN <- Plot,
           MPs = [MmhN-PltN|TMPs]
@@ -228,3 +234,19 @@ gbn_fam_hmaps_rows( [L|Ls], Rels, Rows ) :-
                Ms = Ls, Tows = Rows, Rems = Rels
      ),
      gbn_fam_hmaps_rows( Ms, Rems, Tows ).
+
+gbn_fam_mut_hmap( pl, Rows, _OStem, Opts ) :-
+          mtx_mut_hmap( Rows, Opts ),
+          !.
+gbn_fam_mut_hmap( os, Rows, OStem, Opts ) :-
+     os_ext( OStem, csv, CsvStem ),
+     os_postfix( data_rows, CsvStem, CsvF ),
+     mtx( CsvF, Rows ),
+     findall( Atom, (  member(Opt,[mtx(CsvF)|Opts]),
+                       (Opt =.. [F,A] -> true; throw(non_uninary_opt_in(Opt))),
+                       atomic_list_concat([F,A],'=',Atom)
+                    ),
+                         Atoms ),
+     atomic_list_concat( [upsh|Atoms], Shell ),
+     debuc( gbn(fam_hmaps), 'Shellling: ~w', [Shell] ),
+     shell( Shell ).
