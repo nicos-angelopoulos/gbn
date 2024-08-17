@@ -239,7 +239,7 @@ gbn_fam_mut_hmap( pl, Rows, _OStem, Opts ) :-
           mtx_mut_hmap( Rows, Opts ),
           !.
 gbn_fam_mut_hmap( os, Rows, OStem, Opts ) :-
-     os_ext( OStem, csv, CsvStem ),
+     os_ext( csv, OStem, CsvStem ),
      os_postfix( data_rows, CsvStem, CsvF ),
      mtx( CsvF, Rows ),
      findall( Atom, (  member(Opt,[mtx(CsvF)|Opts]),
