@@ -142,16 +142,10 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     Df <- data.frame( x=integer(), y=character(), m=character(), stringsAsFactors='FALSE' ),
     % fixme: convert this to a recursion
     % there is a version in $local@ampelos, but is not correct
-    findall( _,         (   nth1(Rn,Rwms,Rwm),
-                            between(1,Nc,Cn),
-                            Ri is ((Rn - 1) * Nc ) + Cn,
-                            Df[Ri,1] <- Cn,
-                            Df[Ri,2] <- +Rwm,
-                            Mut <- Rvar[Rn,Cn],
-                            mtx_mut_hmap_clr_value( Bin, Mut, Mfc ),
-                            Df[Ri,3] <- Mfc
-                         ),
-                            _ ),
+    mtx_mut_hmap_df_rows( Rwms, 1, Nc, Bin, Rvar, Df ),
+
+    % trace  % fixme: when x11 is off the plot should be passed to ggsave()
+    % <- print( Df ),
     Rvar <- Df,
     Rvar$y <- as.character(Rvar$y),
     Rvar$y <- factor(Rvar$y, levels=rev(Rwns)),
@@ -192,19 +186,48 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
                   ),
     options( [y_tick_size_x11(YtX),y_tick_size_cow(YtC)], Opts ),
     findall( Gp, member(TickSize,[YtX,YtC]), [GpX,GpC] ),
-    write( options_call( x11(true), real:(<-(print(GpX))), Opts ) ), nl,
-    debuc( real ),
     options_call( x11(true), real:(<-(print(GpX))), Opts ),
     Height is (10 * (Nr + 1)) + LYpad,
     Width  is min( max( 20 + (Nc/4) + LXpad, 70 ), 1024 ),
     append( Opts, [height(Height),width(Width),dpi(300)], SaveOpts ),
-    mtx_mut_hmap_save( SaveOpts ),
+    mtx_mut_hmap_save( GpX, SaveOpts ),
     % nicos.fixme.delete.me.24.08.16
     ( memberchk(plot(Plot),Opts) ->
         Plot = GpC
         ;
         options_rvar_rmv( Rvar, Opts )
     ).
+
+mtx_mut_hmap_df_rows( [], _I, _Nc, _Bin, _Rv, _Df ).
+mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Rvar, Df ) :-
+    /* was
+    findall( _,         (   nth1(Rn,Rwms,Rwm),
+                            between(1,Nc,Cn),
+                            Ri is ((Rn - 1) * Nc ) + Cn,
+                            Df[Ri,1] <- Cn,
+                            Df[Ri,2] <- +Rwm,
+                            Mut <- Rvar[Rn,Cn],
+                            mtx_mut_hmap_clr_value( Bin, Mut, Mfc ),
+                            Df[Ri,3] <- Mfc
+                         ),
+                            _ ),
+                            */
+     mtx_mut_hmap_df_vals( 1, Nc, Rwm, I, Bin, Rvar, Df ),
+     J is I + 1,
+     mtx_mut_hmap_df_rows( Rwms, J, Nc, Bin, Rvar, Df ).
+
+mtx_mut_hmap_df_vals( I, Nc, _Rwm, _Rn, _Bin, _Rv, _Df ) :-
+     Nc < I,
+     !.
+mtx_mut_hmap_df_vals( Cn, Nc, Rwm, Rn, Bin, Rvar, Df ) :-
+     Ri is ((Rn - 1) * Nc ) + Cn,
+     Df[Ri,1] <- Cn,
+     Df[Ri,2] <- +Rwm,
+     Mut <- Rvar[Rn,Cn],
+     mtx_mut_hmap_clr_value( Bin, Mut, Mfc ),
+     Df[Ri,3] <- Mfc,
+     Co is Cn + 1,
+     mtx_mut_hmap_df_vals( Co, Nc, Rwm, Rn, Bin, Rvar, Df ).
 
 mtx_mut_hmap_colours( [H|T], Lvls, Clrs, _Opts ) :-
      !,
@@ -255,30 +278,30 @@ mtx_mut_hmap_clr_value( true, Mut, +(Mfc) ) :-
           )
     ).
 
-mtx_mut_hmap_save( Opts ) :-
+mtx_mut_hmap_save( Ggl, Opts ) :-
     memberchk( outputs(OutS), Opts ),
     !,
     options( stem(Stem), Opts ),
     options( [height(H),width(W),dpi(D)], Opts ),
     en_list( OutS, Outs ),
-    maplist( mtx_mut_hmap_save_on(Stem,[height=H,width=W,dpi=D]), Outs ).
+    maplist( mtx_mut_hmap_save_on(Ggl,Stem,[height=H,width=W,dpi=D]), Outs ).
 mtx_mut_hmap_save( _Opts ).
 
-mtx_mut_hmap_save_on( Stem, Defs, Out ) :-
+mtx_mut_hmap_save_on( Ggl, Stem, Defs, Out ) :-
     atomic( Out ),
     !, 
-    mtx_mut_hmap_save_on_opts( Stem, Out, Defs ).
-mtx_mut_hmap_save_on( Stem, Defs, Out ) :-
+    mtx_mut_hmap_save_on_opts( Ggl, Stem, Out, Defs ).
+mtx_mut_hmap_save_on( Ggl, Stem, Defs, Out ) :-
     Out =.. [Func|Args],
     append( Args, Defs, Opts ),
-    mtx_mut_hmap_save_on_opts( Stem, Func, Opts ).
+    mtx_mut_hmap_save_on_opts( Ggl, Stem, Func, Opts ).
 
-mtx_mut_hmap_save_on_opts( Stem, Ext, Opts ) :-
+mtx_mut_hmap_save_on_opts( Ggl, Stem, Ext, Opts ) :-
     os_ext( Ext, Stem, File ),
     memberchk( height=Height, Opts ),
     memberchk( width=Width, Opts ),
     memberchk( dpi=Dpi, Opts ),
-    <- ggsave( +File, height=Height, width=Width, units="mm", dpi=Dpi, limitsize='FALSE' ).
+    <- ggsave( +File, plot=Ggl, height=Height, width=Width, units="mm", dpi=Dpi, limitsize='FALSE' ).
 
 mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ) :-
     ( string(LegPos) -> atom_string( AtmLegPos, LegPos ) ; AtmLegPos = LegPos ),
