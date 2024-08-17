@@ -192,6 +192,8 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
                   ),
     options( [y_tick_size_x11(YtX),y_tick_size_cow(YtC)], Opts ),
     findall( Gp, member(TickSize,[YtX,YtC]), [GpX,GpC] ),
+    write( options_call( x11(true), real:(<-(print(GpX))), Opts ) ), nl,
+    debuc( real ),
     options_call( x11(true), real:(<-(print(GpX))), Opts ),
     Height is (10 * (Nr + 1)) + LYpad,
     Width  is min( max( 20 + (Nc/4) + LXpad, 70 ), 1024 ),
@@ -207,7 +209,8 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
 mtx_mut_hmap_colours( [H|T], Lvls, Clrs, _Opts ) :-
      !,
      Pairs = [H|T],
-     findall(Clr, (member(Lvl,Lvls),(memberchk(Lvl-Clr,Pairs)->true;throw(missing_colour_spec(Lvl)))), Clrs ).
+     findall(+Clr, (member(Lvl,Lvls),(memberchk(Lvl-Clr,Pairs)->true;throw(missing_colour_spec(Lvl)))), Clrs ),
+     write( colours(Clrs) ), nl.
 mtx_mut_hmap_colours( _, Lvls, Clrs, Opts ) :-
     length( Lvls, LvlsLen ),
     RedAtms <- brewer.pal(9,"Reds"),

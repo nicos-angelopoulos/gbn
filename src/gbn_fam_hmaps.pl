@@ -247,13 +247,17 @@ gbn_fam_mut_hmap( os, Rows, OStem, Opts ) :-
                        ( is_list(A) ->
                               gbn_fam_mut_hmap_lst_os( A, AAtm )
                               ;
-                              A = AAtm
+                              ( string(A) ->
+                                        atomic_list_concat( [stg,A], '=', AAtm )
+                                        ;
+                                        A = AAtm
+                              )
                        ),
                        atomic_list_concat( [F,AAtm], '=', Atom )
                     ),
                          Atoms ),
-     trace,
      atomic_list_concat( [upsh,'gbn:mtx_mut_hmap'|Atoms], ' ', Shell ),
+     write( shell(Shell) ), nl,
      debuc( gbn(fam_hmaps_fine), 'Shellling: ~w', [Shell] ),
      shell( Shell ).
 
