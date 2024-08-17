@@ -73,6 +73,9 @@ Opts
     whether to show the legend
   * legend_font_size(LegFntSz=10)
     font size for the legend text
+  * mtx(Mtx)
+    the input Matrix for the mtx_mut_hmap/1 version.<br>
+    Has no effect on mtx_mut_hmap/2 version.
   * outputs(OutS)
     an output or list of outputs, each being either atomic or compound. 
     The functor, or atom, of each output should be an file extension understood by R's ggsave().
@@ -101,11 +104,20 @@ Opts
 @version 0.1 2017/02/14
 @version 0.2 2022/03/19, support non-mutational hmaps
 @version 0.3 2024/05/08, reduce PL <- R interactions around hclust()
+@version 0.4 2024/08/17, single arg version
 @tbd     make default rvar a non-existant variable
 
 */
+mtx_mut_hmap( Args ) :-
+    options_append( mtx_mut_hmap, Args, Opts, pack(sanger) ),
+    options( mtx(Mtx), Opts ),
+    mtx_mut_hmap_opts( Mtx, Opts ).
+     
 mtx_mut_hmap( MtxIn, Args ) :-
     options_append( mtx_mut_hmap, Args, Opts, pack(sanger) ),
+    mtx_mut_hmap_opts( Mtx, Opts ).
+
+mtx_mut_hmap_opts( Mtx, Opts ) :-
     options( as_mutational(Bin), Opts ),
     options( rvar(Rvar), Opts ),
     options( hclust(Hcl), Opts ),
