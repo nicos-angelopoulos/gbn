@@ -345,7 +345,7 @@ di_member( [_H1|T1], [_H2|T2], E1, E2 ) :-
 gbn_fisher_edge_width( prop, Oval, Pw ) :-
     ( number(Oval) -> atom_number(OvalAtm,Oval); OvalAtm = Oval ), % should go straight to if part below if not a number
     % fixme: is the ONan test too general ?
-    ( (atom_concat(_,'NaN',OvalAtm);Oval=='1.0Inf';Oval==true;Oval=:=0;Oval=:= 1.0Inf ) -> 
+    ( (atom_concat(_,'NaN',OvalAtm);Oval=='1.0Inf';Oval==true;Oval=:=0;Oval=:= 1.0Inf;Oval=='-1.0Inf';Oval=:=(-1.0Inf) ) -> 
         Pw is 4
         ;
         ( Oval > 1 ->

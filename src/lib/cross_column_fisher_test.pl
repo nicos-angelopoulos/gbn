@@ -33,7 +33,13 @@ cross_column_fisher_test( I, J, Cols, Data, SimPv, Inters, Odds ) :-
 	Inters[I,J] <- Pval,
 	IsInf <- is.infinite(OddVal),
 	( IsInf == true ->
-		Odds[I,J]   <- 'NA'
+          Left <- 'f$conf.int[1]',
+          ( Left >= 1 -> % fixme: not sure 1 is best... exclusive seem to be [0.0000,Inf] ; co-occur seem [8k,Inf]
+		     Odds[I,J]   <- 1/0
+               ;
+		     Odds[I,J]   <- -1/0   % fixme, on prompt -1.0Inf does not work on SWI prompt
+          )
+		% Odds[I,J]   <- 'NA'
 		;
 		Odds[I,J]   <- OddVal
 	),
