@@ -133,11 +133,10 @@ gbn_fam_hmaps_plots( [], _I, _GoBn, _Dlists, _Pts, _FamsD, _PrnsD, [], [], _Opts
 gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [LeadRow,BestRow|LBRs], MPs, Opts ) :-
      debuc( gbn(fam_hmaps_fine), 'Node: ~w, with parents: ~w', [Node,Pas] ),
      findall( Ch, (member(Ch-ChPas,GoBn),memberchk(Node,ChPas)), Chs ),
-     Pas \== [],
      \+ (Pas == [], Chs == [] ),
      !,
      options( mut_hmap_iface(Ifc), Opts ),
-     ( PtFs == true ->
+     ( (PtFs == true) ->
           flatten( [Pas,Chs,Node], Family ),  % 24.08.16: makes id-ing the central node easier [was append(Pas,[Node|Chs],Family)]
                                               % fixme: the order is changed later...
           debuc( gbn(fam_hmaps_fine), 'Getting rows for family: ~w', [Family] ),
@@ -158,7 +157,7 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
           ;
           debuc( gbn(fam_hmaps_fine), 'Skipping plot for family of: ~w.', [Node] )
      ),
-     ( PtPs == true ->
+     ( (PtPs == true, Pas \== []) ->
           sort( Pas, OPas ),
           atomic_list_concat( [Node|OPas], '.', PasNodeBase ),
           os_path(PrnsD,PasNodeBase,PasNodeStem),
