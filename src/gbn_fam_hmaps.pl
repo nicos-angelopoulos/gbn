@@ -16,6 +16,8 @@ gbn_fam_hmaps_defaults( Defs ) :-
              col_hmap([]),
              col_mut("#CB181D"),
              col_wt("#08519C"),
+             lbl_mut(mutation),
+             lbl_wt(background),
              multi_prns(true),
              mut_hmap_iface(pl),
              outputs(png),
@@ -55,6 +57,10 @@ Opts:
     The latter also sets the former. Only the first debug() is observed.
   * dir(Dir='.')
     working directory
+  * lbl_mut(Lmt=mutation)
+    label for 1 values (also expands to LmtX for values X > 1)
+  * lbl_wt(Lfg=background)
+    label for 0 values
   * mut_hmap_iface(Ifc=pl)
     Interface for calling mtx_mut_hmap/1,2. Use _os_ for an external call to upsh via shell/1.
   * multi_prns(MuPrns=true)
@@ -148,7 +154,8 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
           os_ext( csv, NodeStem, NodesCsvF ),
           options( [outputs(Outs),x11(X11)], Opts ),
           options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
-          ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)],
+          options( [lbl_mut(Lmt),lbl_wt(Lwt)], Opts ),
+          ComOpts = [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),lbl_mut(Lmt),lbl_wt(Lwt),col_hmap(ClrH)],
           FaOpts = [x11(X11),stem(NodeStem),outputs(Outs)|ComOpts],
           gbn_fam_mut_hmap( Ifc, TmpRows, NodeStem, FaOpts ),
           % mtx_mut_hmap( TmpRows, FaOpts ),
@@ -180,15 +187,18 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
           TMPs = MPs,
           debuc( gbn(fam_hmaps_fine), 'Skipping plot for parents of: ~w.', [Node] )
      ),
-     gbn_family_gates( Node, Pas, Dlists, Gatrix, Opts ),
-     %
-     ( Pas = [_] ->
-          LeadRow = [], BestRow = []
-          ;
-          os_postfix( gates, NodesCsvF, GatesF ),
-          mtx( GatesF, Gatrix ),
-          Gatrix = [BestRow|_], 
-          LeadRow=.. [row,Node|Pas]
+     ( Pas == [] -> 
+                    LeadRow = [], BestRow = []
+                    ;
+                    gbn_family_gates( Node, Pas, Dlists, Gatrix, Opts ),
+                    ( Pas = [_] ->
+                         LeadRow = [], BestRow = []
+                         ;
+                         os_postfix( gates, NodesCsvF, GatesF ),
+                         mtx( GatesF, Gatrix ),
+                         Gatrix = [BestRow|_], 
+                         LeadRow=.. [row,Node|Pas]
+                    )
      ),
      N1 is N + 1,
      !,

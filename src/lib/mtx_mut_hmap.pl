@@ -25,7 +25,7 @@ mtx_mut_hmap_defaults( Defs ) :-
     Defs  = [ as_mutational(true),
               hclust(clms), 
               lbl_wt(background),
-              lbl_mt(mutation),
+              lbl_mut(mutation),
               legend(bottom),
               legend_show(true),
               legend_font_size(10),
@@ -76,7 +76,7 @@ Opts
     whether to show the legend
   * legend_font_size(LegFntSz=10)
     font size for the legend text
-  * lbl_mt(Lmt=mutation)
+  * lbl_mut(Lmt=mutation)
     label for 1 values (also expands to LmtX for values X > 1)
   * lbl_wt(Lfg=background)
     label for 0 values
@@ -147,8 +147,8 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     % fixme: convert this to a recursion
     % there is a version in $local@ampelos, but is not correct
     options( lbl_wt(Lwt), Opts ),
-    options( lbl_mt(Lmt), Opts ),
-    mtx_mut_hmap_df_rows( Rwms, 1, Nc, Bin/Lwt/Lmt, Rvar, Df ),
+    options( lbl_mut(Lmt), Opts ),
+    mtx_mut_hmap_df_rows( Rwms, 1, Nc, Bin, Lwt, Lmt, Rvar, Df ),
 
     % trace  % fixme: when x11 is off the plot should be passed to ggsave()
     % <- print( Df ),
@@ -169,9 +169,9 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
           true
     ),
     LvlsPrv <- levels(as.factor(Rvar$m)),
-    (is_list(LvlsPrv) -> LvlsPrv = Lvls; Lvls = [LvlsPrv]), % fixme: throw error if not a list...
+    (is_list(LvlsPrv) -> LvlsPrv = Lvls; Lvls= [LvlsPrv]), % fixme: throw error if not a list...
     options( col_hmap(ClrH), Opts ),
-    mtx_mut_hmap_colours( ClrH, Lvls, ClrsL, Opts ),
+    mtx_mut_hmap_colours( ClrH, Lvls, Lwt, Lmt, ClrsL, Opts ),
     Clrs =.. [c|ClrsL],   % because cowplot needs them un-magicked...
     Gp = ggplot(Rvar) + geom_tile( aes(x=x,y=y,fill=m), 'show.legend'=ShowLeg ) 
            + scale_fill_manual( values=Clrs)
@@ -219,10 +219,11 @@ mtx_mut_hmap_mtx( _, MtxIn, Rvar ) :-
     Rvar <- Rtx,
     rownames(Rvar) <- Rwns.
 
-mtx_mut_hmap_df_rows( [], _I, _Nc, _Bin, _Rv, _Df ).
-mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Rvar, Df ) :-
+mtx_mut_hmap_df_rows( [], _I, _Nc, _Bin, _Lwt,  _Lmt, _Rv, _Df ).
+mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Lwt, Lmt, Rvar, Df ) :-
     /* was
     findall( _,         (   nth1(Rn,Rwms,Rwm),
+                            between(1,Nc,Cn),
                             between(1,Nc,Cn),
                             Ri is ((Rn - 1) * Nc ) + Cn,
                             Df[Ri,1] <- Cn,
@@ -233,9 +234,9 @@ mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Rvar, Df ) :-
                          ),
                             _ ),
                             */
-     mtx_mut_hmap_df_vals( 1, Nc, Rwm, I, Bin, Rvar, Df ),
+     mtx_mut_hmap_df_vals( 1, Nc, Rwm, I, Bin, Lwt, Lmt, Rvar, Df ),
      J is I + 1,
-     mtx_mut_hmap_df_rows( Rwms, J, Nc, Bin, Rvar, Df ).
+     mtx_mut_hmap_df_rows( Rwms, J, Nc, Bin, Lwt, Lmt, Rvar, Df ).
 
 mtx_mut_hmap_df_vals( I, Nc, _Rwm, _Rn, _Bin, _Lwt, _Lmt,  _Rv, _Df ) :-
      Nc < I,
@@ -250,21 +251,25 @@ mtx_mut_hmap_df_vals( Cn, Nc, Rwm, Rn, Bin, Lwt, Lmt, Rvar, Df ) :-
      Co is Cn + 1,
      mtx_mut_hmap_df_vals( Co, Nc, Rwm, Rn, Bin, Lwt, Lmt, Rvar, Df ).
 
-mtx_mut_hmap_colours( [H|T], Lvls, Clrs, _Opts ) :-
+mtx_mut_hmap_colours( [H|T], Lvls, _Lwt, _Lmt, Clrs, _Opts ) :-
      !,
      Pairs = [H|T],
      findall(+Clr, (member(Lvl,Lvls),(memberchk(Lvl-Clr,Pairs)->true;throw(missing_colour_spec(Lvl)))), Clrs ),
      write( colours(Clrs) ), nl.
-mtx_mut_hmap_colours( _, Lvls, Clrs, Opts ) :-
+mtx_mut_hmap_colours( _, Lvls, Lwt, Lmt, Clrs, Opts ) :-
     length( Lvls, LvlsLen ),
     RedAtms <- brewer.pal(9,"Reds"),
     maplist( atom_string, RedAtms, Reds ),
     options( [col_mut(ClrM),col_wt(ClrW)], Opts ),
-    ( memberchk(background,Lvls) ->
+    ( memberchk(Lwt,Lvls) ->
         ( LvlsLen > 10 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
                           ;
                           ( LvlsLen =:= 2 ->
-                                Clrs = [ClrW,ClrM]
+                                ( Lwt @< Lmt ->
+                                   Clrs = [ClrW,ClrM]
+                                   ;
+                                   Clrs = [ClrM,ClrW]
+                                )
                                 ;
                                 Lim is LvlsLen - 1,
                                 length( RedClrs, Lim ),
