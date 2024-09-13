@@ -24,6 +24,8 @@ mtx_mut_hmap_defaults( Defs ) :-
             ],
     Defs  = [ as_mutational(true),
               hclust(clms), 
+              lbl_bg(background),
+              lbl_mt(mutation),
               legend(bottom),
               legend_show(true),
               legend_font_size(10),
@@ -74,6 +76,10 @@ Opts
     whether to show the legend
   * legend_font_size(LegFntSz=10)
     font size for the legend text
+  * lbl_bg(Lfg=background)
+    label for 0 values
+  * lbl_mt(Lmt=mutation)
+    label for 1 values (also expands to LmtX for values X > 1)
   * mtx(Mtx)
     the input Matrix for the mtx_mut_hmap/1 version.<br>
     Has no effect on mtx_mut_hmap/2 version. Alternative value: _pl_.
@@ -140,7 +146,9 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     Df <- data.frame( x=integer(), y=character(), m=character(), stringsAsFactors='FALSE' ),
     % fixme: convert this to a recursion
     % there is a version in $local@ampelos, but is not correct
-    mtx_mut_hmap_df_rows( Rwms, 1, Nc, Bin, Rvar, Df ),
+    options( lbl_bg(Lbg), Opts ),
+    options( lbl_mt(Lmt), Opts ),
+    mtx_mut_hmap_df_rows( Rwms, 1, Nc, Bin/Lbg/Lmt, Rvar, Df ),
 
     % trace  % fixme: when x11 is off the plot should be passed to ggsave()
     % <- print( Df ),
@@ -229,18 +237,18 @@ mtx_mut_hmap_df_rows( [Rwm|Rwms], I, Nc, Bin, Rvar, Df ) :-
      J is I + 1,
      mtx_mut_hmap_df_rows( Rwms, J, Nc, Bin, Rvar, Df ).
 
-mtx_mut_hmap_df_vals( I, Nc, _Rwm, _Rn, _Bin, _Rv, _Df ) :-
+mtx_mut_hmap_df_vals( I, Nc, _Rwm, _Rn, _Bin, _Lgb, _Lmt,  _Rv, _Df ) :-
      Nc < I,
      !.
-mtx_mut_hmap_df_vals( Cn, Nc, Rwm, Rn, Bin, Rvar, Df ) :-
+mtx_mut_hmap_df_vals( Cn, Nc, Rwm, Rn, Bin, Lbg, Lmt, Rvar, Df ) :-
      Ri is ((Rn - 1) * Nc ) + Cn,
      Df[Ri,1] <- Cn,
      Df[Ri,2] <- +Rwm,
      Mut <- Rvar[Rn,Cn],
-     mtx_mut_hmap_clr_value( Bin, Mut, Mfc ),
+     mtx_mut_hmap_clr_value( Bin, Lbg, Lmt, Mut, Mfc ),
      Df[Ri,3] <- Mfc,
      Co is Cn + 1,
-     mtx_mut_hmap_df_vals( Co, Nc, Rwm, Rn, Bin, Rvar, Df ).
+     mtx_mut_hmap_df_vals( Co, Nc, Rwm, Rn, Bin, Lbg, Lmt, Rvar, Df ).
 
 mtx_mut_hmap_colours( [H|T], Lvls, Clrs, _Opts ) :-
      !,
@@ -272,9 +280,9 @@ mtx_mut_hmap_colours( _, Lvls, Clrs, Opts ) :-
         )
     ).
 
-mtx_mut_hmap_clr_value( false, Mut, Mfc ) :-
+mtx_mut_hmap_clr_value( false, _Lbg, _Lmt, Mut, Mfc ) :-
      Mfc = Mut.
-mtx_mut_hmap_clr_value( true, Mut, +(Mfc) ) :-
+mtx_mut_hmap_clr_value( true, Lbg, Lmt, Mut, +(Mfc) ) :-
      %  mutation = 1, background 0
      %  however, we allow for other values as there might be other discrete values in the dataset
      %  thus we interpret 0 as background and mutI for each value > 0
@@ -282,12 +290,12 @@ mtx_mut_hmap_clr_value( true, Mut, +(Mfc) ) :-
                       % we insist that this a mutational matrix (AsMut==true), even if there are negative
                       % numbers in the matrix. 
                       % This impelentation is "better" in highlighting something is gone wrong, so it is left in
-          Mfc = background 
+          Mfc = Lbg
           ;
           ( Mut =:= 1 -> 
-               Mfc = mutation
+               Mfc = Lmt
                ;
-               atom_concat( mutation, Mut, Mfc )
+               atom_concat( Lmt, Mut, Mfc )
           )
     ).
 
