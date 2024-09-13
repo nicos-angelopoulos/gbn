@@ -2,7 +2,7 @@
 --------------------
 
 0.3
-    24.09.13   OPTS:    new lbl_bg() and lbl_mt() in mtx_mut_hmap
+    24.09.13   OPTS:    new lbl_wt() and lbl_mt() in mtx_mut_hmap
     24.09.10   FIXED:   deal with Inf odds values
     24.08.16   IFACE:   add a mtx_mut_hmap/1 version and to the module interface
                OPTS:    new mut_hmap_iface(Ifc={pl,os}) in gbn_fam_hmaps/1
