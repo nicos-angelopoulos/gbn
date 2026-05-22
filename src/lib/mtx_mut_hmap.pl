@@ -160,7 +160,7 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     mtx_mut_hmap_leg_pads( LegPos, LXpad, LYpad, ActLegPos ),
     PreLvls <- levels(as.factor(Rvar$m)),
     ( catch(maplist(atom_number,PreLvls,LvlsN),_,fail) ->
-          % if all values are numeric, then sort them by numeric value and not lexigocraphically
+          % gbn_family_gatesif all values are numeric, then sort them by numeric value and not lexigocraphically
           sort( LvlsN, LvlsO ),
           maplist( atom_number, NewLvls, LvlsO ),
           Rvar$m <- factor( as.factor(Rvar$m), levels = NewLvls )
@@ -171,7 +171,7 @@ mtx_mut_hmap_opts( MtxIn, Opts ) :-
     LvlsPrv <- levels(as.factor(Rvar$m)),
     (is_list(LvlsPrv) -> LvlsPrv = Lvls; Lvls= [LvlsPrv]), % fixme: throw error if not a list...
     options( col_hmap(ClrH), Opts ),
-    mtx_mut_hmap_colours( ClrH, Lvls, Lwt, Lmt, ClrsL, Opts ),
+    mtx_mut_hmap_colours( ClrH, Lvls, Bin, Lwt, Lmt, ClrsL, Opts ),
     Clrs =.. [c|ClrsL],   % because cowplot needs them un-magicked...
     Gp = ggplot(Rvar) + geom_tile( aes(x=x,y=y,fill=m), 'show.legend'=ShowLeg ) 
            + scale_fill_manual( values=Clrs)
@@ -251,18 +251,23 @@ mtx_mut_hmap_df_vals( Cn, Nc, Rwm, Rn, Bin, Lwt, Lmt, Rvar, Df ) :-
      Co is Cn + 1,
      mtx_mut_hmap_df_vals( Co, Nc, Rwm, Rn, Bin, Lwt, Lmt, Rvar, Df ).
 
-mtx_mut_hmap_colours( [H|T], Lvls, _Lwt, _Lmt, Clrs, _Opts ) :-
+mtx_mut_hmap_colours( [H|T], Lvls, _Bin, _Lwt, _Lmt, Clrs, _Opts ) :-
      !,
      Pairs = [H|T],
      findall(+Clr, (member(Lvl,Lvls),(memberchk(Lvl-Clr,Pairs)->true;throw(missing_colour_spec(Lvl)))), Clrs ),
      write( colours(Clrs) ), nl.
-mtx_mut_hmap_colours( _, Lvls, Lwt, Lmt, Clrs, Opts ) :-
+mtx_mut_hmap_colours( _, Lvls, Bin, Lwt, Lmt, Clrs, Opts ) :-
     length( Lvls, LvlsLen ),
-    RedAtms <- brewer.pal(9,"Reds"),
+    ( (LvlsLen > 9;Bin=false) -> 
+          <- library("wesanderson"),
+          RedAtms <- wes_palette("Zissou1", LvlsLen, type = "continuous")
+          ; 
+          RedAtms <- brewer.pal(9,"Reds")
+    ),
     maplist( atom_string, RedAtms, Reds ),
     options( [col_mut(ClrM),col_wt(ClrW)], Opts ),
     ( memberchk(Lwt,Lvls) ->
-        ( LvlsLen > 10 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
+        ( LvlsLen > 30 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
                           ;
                           ( LvlsLen =:= 2 ->
                                 ( Lwt @< Lmt ->
@@ -278,7 +283,7 @@ mtx_mut_hmap_colours( _, Lvls, Lwt, Lmt, Clrs, Opts ) :-
                           )
         )
         ;
-        ( LvlsLen > 9 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
+        ( LvlsLen > 30 -> throw( too_many_levels_in_discrete_variable_for_mut_hmap(Lvls) )
                          ; 
                          length( Clrs, LvlsLen ),
                          once( append(_,Clrs,Reds) )

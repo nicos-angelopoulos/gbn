@@ -150,7 +150,8 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
           debuc( gbn(fam_hmaps_fine), length, fam_rows/TmpRows ),
           % findall(Row1, (member(ANode1,Family),memberchk([ANode1|Clm1],Dlists),Row1 =.. [row,ANode1|Clm1]), AllRows),
           % parents only: 
-          os_path( FamsD, Node, NodeStem ),
+          ( number(Node) -> atom_number(NodeAtm,Node); NodeAtm = Node ),
+          os_path( FamsD, NodeAtm, NodeStem ),
           os_ext( csv, NodeStem, NodesCsvF ),
           options( [outputs(Outs),x11(X11)], Opts ),
           options( [as_mutational(Bin),col_wt(ClrW),col_mut(ClrM),col_hmap(ClrH)], Opts ),
@@ -190,14 +191,14 @@ gbn_fam_hmaps_plots( [Node-Pas|Bn], N, GoBn, Dlists, PtFs/PtPs, FamsD, PrnsD, [L
      ( Pas == [] -> 
                     LeadRow = [], BestRow = []
                     ;
-                    gbn_family_gates( Node, Pas, Dlists, Gatrix, Opts ),
-                    ( Pas = [_] ->
-                         LeadRow = [], BestRow = []
-                         ;
+                    ( ( gbn_family_gates(Node,Pas,Dlists,Gatrix,Opts),
+                        Pas \= [_] ) ->
                          os_postfix( gates, NodesCsvF, GatesF ),
                          mtx( GatesF, Gatrix ),
                          Gatrix = [BestRow|_], 
                          LeadRow=.. [row,Node|Pas]
+                         ;
+                         LeadRow = [], BestRow = []
                     )
      ),
      N1 is N + 1,

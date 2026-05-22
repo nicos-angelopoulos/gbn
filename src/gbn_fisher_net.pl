@@ -109,18 +109,21 @@ Opts
         (red)
      * ClrExSgn="#BF812D" 
         (golden)
-     * Dash=solid 
-       and
-     * Ew=fix
-
-    =bic= theme is:
-     * ClrCo=ClrCoSgn="#35978F" 
+     * Dash="solid"
+     * Ew="fix"
+     * ClrCo="#35978F"
         (bluegreen)
-     * ClrEx=ClrExSgn="#BF812D" 
+
+   theme =bic= is:
+     * ClrCoSgn="#35978F" 
+        (bluegreen)
+     * ClrEx="#BF812D" 
         (golden)
-     * Dash=dashed
-     * Ew=prop and 
-     * Nw=rel_prop
+     * ClrExSgn="#BF812D" 
+        (golden)
+     * Dash="dashed"
+     * Ew="prop"
+     * Nw="rel_prop"
 
   * dashed(Dash=dashed)
      defines the edge style for edges with pval >= 0.05 (alt: solid)
