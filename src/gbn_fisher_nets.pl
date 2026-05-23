@@ -5,29 +5,29 @@
 /** gbn_fisher_nets.
     gbn_fisher_nets(+Opts).
 
-	Run a number of gbn_fisher_net/4 on files in current directory (version 2, as version 1 got lost).
+	Run a number of gbn_fisher_net/4 calls on files in current directory.
 
-	For now it assumes a single .dat file in current directory and runs this against all .bn files
+	For now it assumes a single .dat file in Dir and runs this against all .bn files
 	creating os_postfix/3 results files with postfix=fish.
-
-	pupsh gbn_fisher_nets postfix=wb graph=bgcolor=white
 
 	Options are passed to gbn_fisher_net/4 except for dir(Dir).
 
 Opts 
- * dir(Dir='.')
-   directory to change to
+  * dir(Dir='.')
+    directory to change to
 
- * rec(Rec=false)
-   allow recursive descend call
+  * rec(Rec='false')
+    allow recursive descend call
 
-==
-%  pupsh gbn_fisher_nets bground=white clr_theme=bic
+Command line examples using pack(upsh).
+== 
+> upsh p gbn_fisher_nets postfix=wb graph=bgcolor=white
+> upsh p gbn_fisher_nets bground=white clr_theme=bic
 ==
 
-Creates an undirected version of the above:
+Creates an undirected version of the second call above:
 ==
-% pupsh gbn_fisher_nets bground=white clr_theme=bic type=graph postfix=biu
+> upsh p gbn_fisher_nets bground=white clr_theme=bic type=graph postfix=biu
 ==
 
 @author nicos angelopoulos

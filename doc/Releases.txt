@@ -2,7 +2,7 @@
 --------------------
 
 0.3
-    26.05.22   DOC:     rendering gbn_fisher_net/4 theme bic, 
+    26.05.22   DOC:     rendering gbn_fisher_net/4 theme bic, and Opts+Examples of gbn_fisher_nets/1
     24.09.13   OPTS:    new lbl_wt() and lbl_mt() in mtx_mut_hmap
     24.09.10   FIXED:   deal with Inf odds values
     24.08.16   IFACE:   add a mtx_mut_hmap/1 version and to the module interface
