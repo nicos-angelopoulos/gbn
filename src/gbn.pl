@@ -18,12 +18,12 @@ D = date(2021, 1, 23).
 @tbd control replacement of dot (and other specials?) in Bn var names via options
 
 */
-gbn_version(0:2:0, date(2021,1,23)).
+gbn_version(0:2:1, date(2026,5,25)).
 
 gbn_defaults( Defs ) :-
 	Defs = [ % dir(Gob),
               copy(false),
-		    data(pack('gbn/data/asia.dat')),
+		    data(pack('gbn/data/asia.bnsl')),
 		    display_dot(svg),
 	         std_output(std_file)
 	       ].
@@ -45,7 +45,7 @@ Options is a term or list of:
     display dot filin format DispDot. false for not displaying.
 
   * data(Dfile) 
-    The datafile on which gobnilp will be ran (*pack(gbn/data/asia_100.dat*)).
+    The datafile on which gobnilp will be ran (*pack(gbn/data/asia.bnsl*)).
 
   * debug(Dbg)  
     can be =|false|= (also _true_=_gbn_ or _all_).
@@ -54,7 +54,7 @@ Options is a term or list of:
     run multiple experiments where setting is given each Val-ue in turn
 
   * probname(Pbname)
-    used as stem for output files. Defaults is the stem of Dfile (so for Dfile =../data/asia.dat the stem is _asia_).
+    used as stem for output files. Defaults is the stem of Dfile (so for Dfile =../data/asia.bnsl the stem is _asia_).
 
   * std_ouput(StdO)   
     what to do with gobnilp output ?, (*std_file*,output,<file>). Where std_file is <Pbname>_std_output.txt
