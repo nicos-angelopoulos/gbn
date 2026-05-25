@@ -22,6 +22,7 @@ gbn_version(0:2:1, date(2026,5,25)).
 
 gbn_defaults( Defs ) :-
 	Defs = [ % dir(Gob),
+              adjmat(false),
               copy(false),
 		    data(pack('gbn/data/asia.bnsl')),
 		    display_dot(svg),
@@ -35,6 +36,8 @@ Run a GOBNILP, Bayesian networks (BNs) learning task and/or post-run routines on
 
 Options is a term or list of:
 
+  * adjmat(AdjMat=false)
+     if not ==false== the the adjmatrix is outputed (if ==true== to <Pbname>_adjmat.txt, else AdjMat is take as the full file name).
   * copy(Copy=false)
     if set to anything else than false the local file Copy is copied into Dir- multiple are allowed
 
@@ -103,9 +106,9 @@ gbn( Args ) :-
 
 gbn_singleton( ProbName, DBname, SetsF, All ) :-
 	debuc( gbn(gbn), 'Settings on: ~w', SetsF ),
-	atomic_list_concat( ['-g=',SetsF], Garg ),
+	% atomic_list_concat( ['-s ',SetsF], Garg ),
 	selectchk( std_output(Sout), All, _NsAll ),
-	std_output_gobnilp( Sout, Garg, ProbName, DBname ),
+	std_output_gobnilp( Sout, SetsF, ProbName, DBname ),
 	options( display_dot(DispDot), All ),
 	gbn_singleton_display_dot( DispDot, SetsF ).
 
@@ -189,16 +192,16 @@ gbn_out_dir( ProbName, Dir, Opts ) :-
 	( memberchk(dir(Dir),Opts) -> true % returns it
 	                            ; true ).
 
-std_output_gobnilp( output, Garg, _Prob, DBname ) :-
-	@ gobnilp( Garg, DBname ).
-std_output_gobnilp( std_file, Garg, Prob, DBname ) :-
+std_output_gobnilp( output, SetsF, _Prob, DBname ) :-
+	@ gobnilp( '-s', SetsF, '-f', DBname ).
+std_output_gobnilp( std_file, SetsF, Prob, DBname ) :-
 	atom_concat( Prob, '_std_output', ProbStdOut ),
 	file_name_extension( ProbStdOut, txt, PSOf ),
 	!,
-	file_ouput_gobnilp( PSOf, Garg, DBname ).
+	file_ouput_gobnilp( PSOf, SetsF, DBname ).
 
-file_ouput_gobnilp( OutF, Garg, DBname ) :-
-	Outs @@ gobnilp( Garg, DBname ),
+file_ouput_gobnilp( OutF, SetsF, DBname ) :-
+	Outs @@ gobnilp( '-s', SetsF, '-f', DBname ),
 	open( OutF, write, Out ),
 	maplist( writenl(Out), Outs ),
 	close( Out ).
@@ -217,14 +220,24 @@ gbn_prob_name( All, ProbName, DBname, All ) :-
 gob_prob_name_settings( ProbName, _DBname, SetsF, Opts ) :-
 	file_name_extension( ProbName, set, SetsF ),
 	open( SetsF, write, Out ),
-	gob_stream_setting( Out, 'nbns', 1 ),
-	gob_stream_setting( Out, 'outputfile/solution', ProbName, bn ),
+     % fixme: the following two have disappeared 26.05.25
+	% gob_stream_setting( Out, 'nbns', 1 ),
+	% gob_stream_setting( Out, 'outputfile/solution', ProbName, bn ),
 	% gob_stream_setting( Out, 'outputfile/solution', '"ran-asia/asia.bn"' ),
-	gob_stream_setting( Out, 'outputfile/dot', ProbName, dot ),
+	gob_stream_setting( Out, 'outputfile/dotfile', ProbName, dot ),
 	atom_concat( ProbName, '_scnti', Scnti ),
-	gob_stream_setting( Out, 'outputfile/scoreandtime', Scnti, txt ),
+	gob_stream_setting( Out, 'outputfile/scoreandtimefile', Scnti, txt ),
+     options( adjmat(AdjMat), Opts ),
+     gob_prob_name_setting( AdjMat, ProbName, AmF ),
+	gob_stream_setting( Out, 'outputfile/adjacencymatrixfile', AmF ),
 	findall( _, (member(setting(Key,Val),Opts),gob_stream_setting(Out,Key,Val)), _ ),
 	close( Out ).
+
+gob_prob_name_setting( false, _, '' ) :- !.
+gob_prob_name_setting( true, ProbName, AmF ) :- 
+     !,
+     atomic_list_concat( [ProbName,'adjmat.txt'], '_', AmF ).
+gob_prob_name_setting( Else, _ProbName, Else ).
 
 gob_stream_setting( Out, Key, Value ) :-
 	write( Out, 'gobnilp/' ), 

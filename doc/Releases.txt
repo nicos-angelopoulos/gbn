@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    26.05.25   UPDATE:  changes for supporting current GOBNILP (breaks backward compatibility)
     26.05.22   DOC:     rendering gbn_fisher_net/4 theme bic, and Opts+Examples of gbn_fisher_nets/1
     24.09.13   OPTS:    new lbl_wt() and lbl_mt() in mtx_mut_hmap
     24.09.10   FIXED:   deal with Inf odds values
