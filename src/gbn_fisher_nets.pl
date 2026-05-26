@@ -7,7 +7,7 @@
 
 	Run a number of gbn_fisher_net/4 calls on files in current directory.
 
-	For now it assumes a single .dat file in Dir and runs this against all .bn files
+	For now it assumes a single .bnsl (was .dat) file in Dir and runs this against all .bn files
 	creating os_postfix/3 results files with postfix=fish.
 
 	Options are passed to gbn_fisher_net/4 except for dir(Dir).
@@ -43,7 +43,7 @@ gbn_fisher_nets( Args ) :-
 	working_directory( Here, Here ),
 	( select(dir(Dir),Opts2,Opts) -> working_directory(_Old,Dir) ; Opts = Opts2 ),
 	os_files( Files ),
-	include( os_ext(dat), Files, DatFs ),
+	include( os_ext(bnsl), Files, DatFs ),
 	gbn_data_file( DatFs, DatF ),
 
 	include( os_ext(bn), Files, BnFs ),
