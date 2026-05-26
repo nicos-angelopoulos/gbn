@@ -212,7 +212,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     mtx( OutCsvF, CsvRows ),
 
     GbnG = gbn_fisher_signif_dot_edges(Ew,PvalsRv,OddsRv,Ces,Ccs,Bn,Fraph,FAttrsNest),
-    os_ext( dat, dot, DatF, FisFPrv ),
+    os_ext( _, dot, DatF, FisFPrv ),
     os_postfix( fisher, FisFPrv, FisF ),
     gbn_fisher_if( FisF, GbnG, Fraph, NAttrs, FAttrsNest, Opts ), 
     maplist( <<-, [IntDfRv,PvalsIntRv,PvalsRv,OddsRv] ),
