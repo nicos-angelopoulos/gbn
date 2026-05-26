@@ -24,6 +24,7 @@ gbn_defaults( Defs ) :-
 	Defs = [ % dir(Gob),
               adjmat(false),
               copy(false),
+              discrete(true),
 		    data(pack('gbn/data/asia.bnsl')),
 		    display_dot(svg),
 	         std_output(std_file)
@@ -224,6 +225,12 @@ gob_prob_name_settings( ProbName, _DBname, SetsF, Opts ) :-
 	% gob_stream_setting( Out, 'nbns', 1 ),
 	% gob_stream_setting( Out, 'outputfile/solution', ProbName, bn ),
 	% gob_stream_setting( Out, 'outputfile/solution', '"ran-asia/asia.bn"' ),
+     ( options(discrete(true), Opts) ->
+          gob_stream_setting( Out, score_type, 'BDeu' )
+          ;
+          true
+          % gob_stream_setting( Out, score_type, 'GaussianL0' )
+     ),
 	gob_stream_setting( Out, 'outputfile/dotfile', ProbName, dot ),
 	atom_concat( ProbName, '_scnti', Scnti ),
 	gob_stream_setting( Out, 'outputfile/scoreandtimefile', Scnti, txt ),
