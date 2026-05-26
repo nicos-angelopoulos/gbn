@@ -18,7 +18,7 @@ D = date(2021, 1, 23).
 @tbd control replacement of dot (and other specials?) in Bn var names via options
 
 */
-gbn_version(0:2:1, date(2026,5,25)).
+gbn_version(0:2:2, date(2026,5,26)).
 
 gbn_defaults( Defs ) :-
      Defs = [ % dir(Gob),
