@@ -32,7 +32,7 @@ gbn_fam_hmaps_defaults( Defs ) :-
 Create family and parental heatmaps for all families and all Bns in directory Dir (default is the current directory).
 
 Every file ending in .bn is taken to be a (Gobnilp generated) BN. 
-There should be a single .dat file in the directory, which is taken to hold
+There should be a single .bnsl (was .dat) file in the directory, which is taken to hold
 the data used to create all BNs (Gobnilp default format).
 
 The predicate creates 2 types of heatmaps: parental and family based. Family ones includes the children of a node 
