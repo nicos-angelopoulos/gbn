@@ -179,8 +179,10 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     gbn_fisher_nodes_attributes( Nw, PrvDataPl, NAttrs ),
     % debug( gbn(fisher_net), 'Nodes attrs: ~w', [NAttrs] ),
 
-    gbn_term( BnF, Bn, _ ),
-    debuc( gbn(fisher_net), 'Bn read from file: ~p, is: ~w', [BnF,Bn] ),
+    % gbn_term( BnF, Bn, _ ),  % depends on old GOBNILP output
+    ( os_ext(bn,BnStem,BnF) -> ext(dot,BnStem,BnDotF); BnDotF = BnF ),
+    dot_file_bn_fams( BnDotF, Bn ),
+    debuc( gbn(fisher_net), 'Bn read from file: ~p, is: ~w', [BnDotF,Bn] ),
     maplist( gbn_fisher_family_metrics(PvalsRv,OddsRv), Bn, MeTripsPrv ),
     flatten( MeTripsPrv, MeTrips ),
     memberchk( edge_metrics(MeTrips), Opts ),
@@ -191,7 +193,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     % maplist( EAGoal, Bn, EAttrsNest ),
     % flatten( EAttrsNest, EAttrs ),
 
-    gbn_fisher_dot_file( DotF, fclr, BnF ),
+    gbn_fisher_dot_file( BnDotF, fclr, DotF ),
     options( postfix(Psfx), Opts ),
     os_postfix( Psfx, DotF, PsfxDotF ),
     os_ext( _, DotS, PsfxDotF ),
@@ -216,7 +218,7 @@ gbn_fisher_net( DatF, BnF, DotF, Args ) :-
     os_postfix( fisher, FisFPrv, FisF ),
     gbn_fisher_if( FisF, GbnG, Fraph, NAttrs, FAttrsNest, Opts ), 
     maplist( <<-, [IntDfRv,PvalsIntRv,PvalsRv,OddsRv] ),
-    debuc( gbn(fisher_net), 'Done fishing for: ~p', BnF ).
+    debuc( gbn(fisher_net), 'Done fishing for: ~p', BnDotF ).
 
 /** gbn_fisher_metrics( +DatF, +BnF, +Adj, -PrvDataPl, -RGbnDf, -RGbnIn, -PvalsRv, -OddsRv ).
 
@@ -324,11 +326,12 @@ gbn_fisher_if( FisF, Goal, Fraph, NAttrs, FAttrsNest, Opts ) :-
     append( Opts,  Fbns, Fohed ),
     disp_bn( Fraph, Fohed ).
 
-gbn_fisher_dot_file( DotF, Psfix, BnF ) :-
+gbn_fisher_dot_file( BnDotF, Psfix, DotF ) :-
     var( DotF ),
     !,
-    os_ext( _, dot, BnF, IntDotF ),
-    os_postfix( Psfix, IntDotF, DotF ).
+    % we switching to .dot BN input
+    % os_ext( _, dot, BnF, IntDotF ),
+    os_postfix( Psfix, BnDotF, DotF ).
 gbn_fisher_dot_file( _DotF, _Psfix, _BnF ).
 
 gbn_fisher_nodes_attributes( fix, _PrvDataPl, [] ).

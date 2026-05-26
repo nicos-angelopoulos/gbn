@@ -19,6 +19,7 @@
 :- use_module(library(pio)).
 :- use_module(library(apply)).
 :- use_module(library(lists)).
+:- use_module(library(ordsets)).  % list_to_ord_set/2 in dot_file_bn_fams.pl only
 :- use_module(library(filesex)).
 :- use_module(library(process)).
 
@@ -62,6 +63,7 @@ user:file_search_path( cancer, pack('gbn/run/gbns_in_cancer') ).
 :- lib(gbn_res_dir_dat_file/2).
 :- lib(dot_fix/1).
 :- lib(gg_muts_by_pnms/3).
+:- lib(dot_file_bn_fams/2).
 
 :- lib(end(gbn)).
 
@@ -135,9 +137,10 @@ true.
 @version  0.0.1 2014/4/8
 @version  0.1.0 2021/1/19
 @version  0.2.0 2021/1/23
+@version  0.3.0 2026/6/26,  support for GOBNILP@Scip.10.0.2
 @see https://doi.org/10.1038/s42003-022-03243-w
 @see https://stoics.org.uk/~nicos/sware/gbn
-@see https://www.cs.york.ac.uk/aig/sw/gobnilp/
+@see https://bitbucket.org/jamescussens/gobnilp
 @see gbn/1
 @see gbn_version/2
 
