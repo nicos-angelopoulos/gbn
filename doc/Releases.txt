@@ -2,6 +2,7 @@
 --------------------
 
 0.3
+    26.05.26   OPTS:    palim(4), sets the old GOBNILP behaviour as default (the new GOBNILP def is no constraint)
     26.05.25   OPTS:    discrete(true), which changes default GOBNILP "gobnilp/score_type" to discrete scoring
     26.05.25   UPDATE:  changes for supporting current GOBNILP (breaks backward compatibility)
     26.05.22   DOC:     rendering gbn_fisher_net/4 theme bic, and Opts+Examples of gbn_fisher_nets/1
