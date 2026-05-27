@@ -27,7 +27,7 @@ gbn_defaults( Defs ) :-
               discrete(true),
               data(pack('gbn/data/asia.bnsl')),
               display_dot(svg),
-              palim(4),
+              palim(3),
               std_output(std_file)
             ].
 
@@ -59,8 +59,8 @@ Options is a term or list of:
   * multiple(Setting,Vals)
     run multiple experiments where setting is given each Val-ue in turn
 
-  * palim(PaLim=4)
-    max no of parents allowed. Used to be 4 in GOBNILP but now is unrestricted which makes finding the best model a lot harder for bigger problems.
+  * palim(PaLim=3)
+    max no of parents allowed. Used to be 3 in GOBNILP but now is unrestricted which makes finding the best model a lot harder for bigger problems.
     Set to -1 to remove the constraint.
 
   * probname(Pbname)
@@ -75,6 +75,7 @@ Options is a term or list of:
 @author nicos angelopoulos
 @version  0.1 2014/4/8
 @version  0.2 2021/1/23
+@version  0.3 2026/5/27,  major update to match current GOBNILP 
 @tbd  subdirs option (ie non flat run dirs)
 @tbd  bootstraps
 @tbd  hook on to the c-code  (see pack(gob))
