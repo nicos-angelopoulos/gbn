@@ -27,10 +27,10 @@ gbn_fisher_theme_colours( bic, "#35978F", "#35978F", "#BF812D", "#BF812D", "#5D8
 gbn_fisher_theme_dashed( org, solid ).
 gbn_fisher_theme_dashed( bic, dashed ).
 
-gbn_fisher_theme_edge_width( org, fix ).
+gbn_fisher_theme_edge_width( org, none ).
 gbn_fisher_theme_edge_width( bic, prop ).
 
-gbn_fisher_theme_node_pen_width( org, fix ).
+gbn_fisher_theme_node_pen_width( org, none ).
 gbn_fisher_theme_node_pen_width( bic, rel_prop ).
 
 % gbn_fisher_theme_background( org, '#D3D3D3' ).
@@ -110,7 +110,7 @@ Opts
      * ClrExSgn="#BF812D" 
         (golden)
      * Dash="solid"
-     * Ew="fix"
+     * Ew="none"
      * ClrCo="#35978F"
         (bluegreen)
 
@@ -135,10 +135,10 @@ Opts
      if present, returns the edge metrics used, in a list of X-Y-po(Pval,Odds)
 
   * edge_width(Ew=prop)
-     defines the edge width for edges (_prop_ or _fix_)
+     defines the edge width for edges (_prop_ or _none_)
 
   * node_pen_width(Nw=rel_prop)
-     defines the edge width for edges (_rel_prop_ or _fix_)
+     defines the pen width for nodes (_rel_prop_ or _none_)
 
   * postfix(Psfx='')
     postfix for the output file (postfixing input). Defaults to '' if Theme == org
@@ -334,7 +334,7 @@ gbn_fisher_dot_file( BnDotF, Psfix, DotF ) :-
     os_postfix( Psfix, BnDotF, DotF ).
 gbn_fisher_dot_file( _DotF, _Psfix, _BnF ).
 
-gbn_fisher_nodes_attributes( fix, _PrvDataPl, [] ).
+gbn_fisher_nodes_attributes( none, _PrvDataPl, [] ).
 gbn_fisher_nodes_attributes( rel_prop, Mtx, NAttrs ) :-
     mtx_value_column_frequencies( Mtx, 1, Freqs ),
     kv_decompose( Freqs, Lbls, Times ),
@@ -363,7 +363,7 @@ gbn_fisher_edge_width( prop, Oval, Pw ) :-
             % Pw is max( 1, 4 - (6 * Oval) )
         )
     ).
-gbn_fisher_edge_width( fix, _Oval, 1 ).
+gbn_fisher_edge_width( none, _Oval, 1 ).
 
 /*
 gbn_fisher_gated_edges( [], Fraph, Fraph, [] ).
