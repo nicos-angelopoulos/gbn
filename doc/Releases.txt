@@ -2,6 +2,8 @@
 --------------------
 
 0.3
+    26.06.05   UPDATE:  few more changes for new GOBNILP
+               FIXED:   avoid writing non multiple settings when given in a multiple session
     26.05.26   OPTS:    palim(3), sets the old GOBNILP behaviour as default (the new GOBNILP def is no constraint)
                UPDATE:  changed .dat to .bnsl in gbn_fisher_nets.pl, gbn_fisher_net.pl, gbn_res_dir_dat_file.pl
                LIB:     dot_file_bn_fams/2 to work around lack of .bn outputs from GOBNILP

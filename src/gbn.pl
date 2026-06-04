@@ -154,7 +154,8 @@ gbn_multiples( ProbName, DBname, SetsF, All ) :-
                               sub_atom(Ley,0,1,_,Ktkn)
                            )
                          ), KKVss ),
-     exclude( form_term(multiple/2), All, Opts ),
+     exclude( form_term(multiple/2), All, NoMLOpts ),
+     exclude( form_term(setting/2), NoMLOpts, Opts ),  % already written on trunk file
      once((gbn_multiples_loop(KKVss,ProbName,DBname,SetsF,'',Opts);true)).
 
 gbn_multiples_loop( [], ProbName, DBname, SetsF, StemExt, All ) :-
