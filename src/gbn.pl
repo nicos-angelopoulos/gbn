@@ -265,13 +265,9 @@ gob_stream_setting( Out, Key, Value ) :-
      write( Out, 'gobnilp/' ), 
      write( Out, Key ), 
      write( Out, ' = ' ),
-     ( number(Value) -> write(Out,Value)
-                        ; 
-                        write(Out,'"' ),
-                        write(Out,Value),
-                        write(Out,'"' ) 
-     ),
+     gob_stream_setting_write_value( Out, Value ),
      nl( Out ).
+
 gob_stream_setting( Out, Key, Value, Ext ) :-
      write( Out, 'gobnilp/' ),
      write( Out, Key ),
@@ -281,3 +277,15 @@ gob_stream_setting( Out, Key, Value, Ext ) :-
      write( Out, Ext ),
      write( Out, '"' ),
      nl( Out ).
+
+gob_stream_setting_write_value( Out, Value ) :-
+     ( (number(Value);gob_value_boolean(Value)) ->
+                        write(Out,Value)
+                        ; 
+                        write(Out,'"' ),
+                        write(Out,Value),
+                        write(Out,'"' ) 
+     ).
+
+gob_value_boolean( 'TRUE' ).
+gob_value_boolean( 'FALSE' ).
