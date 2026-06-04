@@ -163,6 +163,7 @@ gbn_multiples_loop( [], ProbName, DBname, SetsF, StemExt, All ) :-
      gbn_settings_file_append( ToSetsF, All ),
      gbn_singleton( ProbName, DBname, ToSetsF, [display_dot(false)|All] ),
      % fixme: change svg, to DispDot option
+     % fixme: remove .bn below- no longer produced in new GOBNILP
      maplist( gbn_multiple_rename(SetsF,ToSetsF), [dot,bn] ),
      options( display_dot(DispDot), All ),
      gbn_singleton_display_dot( DispDot, ToSetsF ).
@@ -185,7 +186,12 @@ form_term( Name/Arity, Term ) :-
 gbn_multiple_rename( SetsF, ToSetsF, Ext ) :-
      os_ext( Old, Ext, SetsF, From ),
      os_ext( Old, Ext, ToSetsF, To ),
-     @ mv( -i, From, To ).
+     % fixme: this is transitional to cope with .bn files. Should be removed once we fully transition to latest GOBNILP
+     ( exists_file(From) -> 
+          @ mv( -i, From, To )
+          ;
+          true
+     ).
 
 gbn_out_dir( _ProbName, Dir, All ) :-
      memberchk( dir(Dir), All ),
